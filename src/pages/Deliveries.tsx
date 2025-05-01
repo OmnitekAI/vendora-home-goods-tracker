@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
-import { Delivery, DeliveryItem, Location, Product } from "@/types";
+import { Delivery, Location, Product } from "@/types";
 import {
   getDeliveries,
   saveDelivery,
@@ -13,7 +13,7 @@ import {
   generateId,
   getLocations,
   getProducts,
-} from "@/utils/dataStorage";
+} from "@/utils/storage"; // Updated import path
 import { EmptyDeliveries } from "@/components/deliveries/EmptyDeliveries";
 import { DeliveryCard } from "@/components/deliveries/DeliveryCard";
 import { DeliveryDialog } from "@/components/deliveries/DeliveryDialog";

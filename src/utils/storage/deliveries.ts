@@ -19,12 +19,19 @@ export const saveDelivery = (delivery: Delivery): void => {
   }
   
   saveData(data);
-  toast.success(`Delivery ${index >= 0 ? 'updated' : 'added'}`);
+  
+  const message = index >= 0 ? 
+    { en: "Delivery updated", es: "Entrega actualizada" } : 
+    { en: "Delivery added", es: "Entrega añadida" };
+  
+  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
 };
 
 export const deleteDelivery = (id: string): void => {
   const data = loadData();
   data.deliveries = data.deliveries.filter(d => d.id !== id);
   saveData(data);
-  toast.success("Delivery deleted");
+  
+  const message = { en: "Delivery deleted", es: "Entrega eliminada" };
+  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
 };

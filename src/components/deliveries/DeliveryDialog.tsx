@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Delivery, DeliveryItem, Location, Product } from "@/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, X } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
-import { getProductName } from "@/utils/dataStorage";
+import { getProductName } from "@/utils/storage"; // Updated import path
 import { useLanguage } from "@/context/LanguageContext";
 
 interface DeliveryDialogProps {
@@ -54,9 +54,9 @@ export const DeliveryDialog = ({
   });
 
   // Update internal state when the prop changes
-  useState(() => {
+  useEffect(() => {
     setDelivery(currentDelivery);
-  });
+  }, [currentDelivery]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -70,12 +70,12 @@ export const DeliveryDialog = ({
     e.preventDefault();
     
     if (!delivery.locationId) {
-      toast.error("Location is required");
+      toast.error(translations.common.required);
       return;
     }
     
     if (delivery.items.length === 0) {
-      toast.error("At least one product is required");
+      toast.error(translations.common.required);
       return;
     }
     
@@ -84,7 +84,7 @@ export const DeliveryDialog = ({
 
   const handleAddItem = () => {
     if (!newItem.productId || newItem.quantity <= 0) {
-      toast.error("Select a product and specify quantity");
+      toast.error(translations.common.required);
       return;
     }
 
@@ -141,6 +141,10 @@ export const DeliveryDialog = ({
     return items.reduce((sum, item) => sum + item.quantity * item.pricePerUnit, 0);
   };
 
+  // Fix: Ensure we have valid locations and products before rendering
+  const hasValidLocations = locations && locations.length > 0;
+  const hasValidProducts = products && products.length > 0;
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -161,20 +165,24 @@ export const DeliveryDialog = ({
                 <div className="grid gap-2">
                   <Label htmlFor="locationId">{translations.locations.title}</Label>
                   <Select
-                    value={delivery.locationId}
+                    value={delivery.locationId || undefined}
                     onValueChange={(value) =>
                       setDelivery({ ...delivery, locationId: value })
                     }
                   >
                     <SelectTrigger id="locationId">
-                      <SelectValue placeholder="Select a location" />
+                      <SelectValue placeholder={translations.deliveries.selectLocation} />
                     </SelectTrigger>
                     <SelectContent>
-                      {locations.map((location) => (
-                        <SelectItem key={location.id} value={location.id}>
-                          {location.name}
-                        </SelectItem>
-                      ))}
+                      {hasValidLocations ? (
+                        locations.map((location) => (
+                          <SelectItem key={location.id} value={location.id}>
+                            {location.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no_locations_available">{translations.common.noData}</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -198,18 +206,22 @@ export const DeliveryDialog = ({
                     {/* Add new item form */}
                     <div className="grid grid-cols-3 gap-2 mb-4">
                       <Select
-                        value={newItem.productId}
+                        value={newItem.productId || undefined}
                         onValueChange={handleProductChange}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder={translations.deliveries.product} />
                         </SelectTrigger>
                         <SelectContent>
-                          {products.map((product) => (
-                            <SelectItem key={product.id} value={product.id}>
-                              {product.name}
-                            </SelectItem>
-                          ))}
+                          {hasValidProducts ? (
+                            products.map((product) => (
+                              <SelectItem key={product.id} value={product.id}>
+                                {product.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="no_products_available">{translations.common.noData}</SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                       <div className="flex gap-2 col-span-2">

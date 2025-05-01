@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { Product } from "@/types";
-import { getProducts, generateId } from "@/utils/dataStorage";
+import { getProducts, saveProduct, generateId } from "@/utils/storage"; // Updated import path
 import { ProductDialog } from "@/components/products/ProductDialog";
 import { ProductCategory } from "@/components/products/ProductCategory";
 import { EmptyProducts } from "@/components/products/EmptyProducts";
@@ -132,9 +132,7 @@ const Products = () => {
 
         <ProductDialog
           isOpen={isDialogOpen}
-          onClose={() => {
-            handleCloseDialog();
-          }}
+          onClose={handleCloseDialog}
           product={currentProduct}
           categories={categories}
           isNew={id === "new"}

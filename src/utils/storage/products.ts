@@ -2,6 +2,7 @@
 import { Product } from "@/types";
 import { toast } from "@/components/ui/sonner";
 import { loadData, saveData } from "./core";
+import { useLanguage } from "@/context/LanguageContext";
 
 export const getProducts = (): Product[] => {
   const data = loadData();
@@ -19,14 +20,21 @@ export const saveProduct = (product: Product): void => {
   }
   
   saveData(data);
-  toast.success(`Product ${index >= 0 ? 'updated' : 'added'}`);
+  
+  const message = index >= 0 ? 
+    { en: "Product updated", es: "Producto actualizado" } : 
+    { en: "Product added", es: "Producto añadido" };
+  
+  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
 };
 
 export const deleteProduct = (id: string): void => {
   const data = loadData();
   data.products = data.products.filter(p => p.id !== id);
   saveData(data);
-  toast.success("Product deleted");
+  
+  const message = { en: "Product deleted", es: "Producto eliminado" };
+  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
 };
 
 export const getProductName = (id: string): string => {
