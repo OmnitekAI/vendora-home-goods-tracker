@@ -120,13 +120,13 @@ const DashboardCharts = ({
           <Tabs defaultValue="monthly" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="monthly">
-                {language === "en" ? "Monthly Revenue" : "Ingresos Mensuales"}
+                {translations.reports.monthlyRevenue}
               </TabsTrigger>
               <TabsTrigger value="products">
-                {language === "en" ? "Products" : "Productos"}
+                {translations.reports.products}
               </TabsTrigger>
               <TabsTrigger value="locations">
-                {language === "en" ? "Locations" : "Ubicaciones"}
+                {translations.reports.locations}
               </TabsTrigger>
             </TabsList>
             <TabsContent value="monthly" className="pt-4 min-h-[500px]">

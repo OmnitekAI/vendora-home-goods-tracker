@@ -1,3 +1,4 @@
+
 export const spanish = {
   app: {
     title: "Vendora",
@@ -17,6 +18,16 @@ export const spanish = {
   },
   dashboard: {
     welcome: "Bienvenido a Vendora",
+    topSellingProducts: "Productos Más Vendidos",
+    topSellingProductsDescription: "Productos con el mayor volumen de ventas",
+    quickAccess: "Acceso Rápido",
+    quickAccessDescription: "Tareas comunes para comenzar",
+    addNewLocation: "Añadir Nueva Ubicación",
+    addNewProduct: "Añadir Nuevo Producto",
+    recordDelivery: "Registrar Entrega",
+    recordSale: "Registrar Venta",
+    sold: "vendidos",
+    noSalesRecorded: "Aún no se han registrado ventas",
   },
   navbar: {
     dashboard: "Panel",

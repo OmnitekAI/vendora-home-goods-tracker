@@ -1,3 +1,4 @@
+
 export const english = {
   app: {
     title: "Vendora",
@@ -17,6 +18,16 @@ export const english = {
   },
   dashboard: {
     welcome: "Welcome to Vendora",
+    topSellingProducts: "Top Selling Products",
+    topSellingProductsDescription: "Products with the highest sales volume",
+    quickAccess: "Quick Access",
+    quickAccessDescription: "Common tasks to get started",
+    addNewLocation: "Add New Location",
+    addNewProduct: "Add New Product",
+    recordDelivery: "Record Delivery",
+    recordSale: "Record Sale",
+    sold: "sold",
+    noSalesRecorded: "No sales recorded yet",
   },
   navbar: {
     dashboard: "Dashboard",

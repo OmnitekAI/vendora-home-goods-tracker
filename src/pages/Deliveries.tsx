@@ -20,7 +20,7 @@ import { DeliveryDialog } from "@/components/deliveries/DeliveryDialog";
 import { useLanguage } from "@/context/LanguageContext";
 
 const Deliveries = () => {
-  const { translations } = useLanguage();
+  const { translations, language } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
@@ -60,10 +60,10 @@ const Deliveries = () => {
         setIsDialogOpen(true);
       } else {
         navigate("/deliveries");
-        toast.error("Delivery not found");
+        toast.error(language === "en" ? "Delivery not found" : "Entrega no encontrada");
       }
     }
-  }, [id, deliveries, locations, navigate]);
+  }, [id, deliveries, locations, navigate, language]);
 
   const loadDeliveries = () => {
     const loadedDeliveries = getDeliveries();
@@ -108,15 +108,15 @@ const Deliveries = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat(language === "en" ? "en-US" : "es-ES", {
       style: "currency",
-      currency: "USD",
+      currency: language === "en" ? "USD" : "EUR",
     }).format(amount);
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
+    return new Intl.DateTimeFormat(language === "en" ? "en-US" : "es-ES", {
       year: "numeric",
       month: "short",
       day: "numeric",

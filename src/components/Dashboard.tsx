@@ -9,7 +9,7 @@ import DashboardCharts from "./dashboard/DashboardCharts";
 import { useLanguage } from "@/context/LanguageContext";
 
 const Dashboard = () => {
-  const { language } = useLanguage();
+  const { language, translations } = useLanguage();
   const [stats, setStats] = useState({
     locationCount: 0,
     productCount: 0,
@@ -114,7 +114,8 @@ const Dashboard = () => {
       if (monthlyRevenue[monthKey] !== undefined) {
         let saleTotal = 0;
         sale.items.forEach(item => {
-          saleTotal += item.price * item.quantity;
+          // Fix: Change item.price to item.unitPrice
+          saleTotal += item.unitPrice * item.quantity;
         });
         monthlyRevenue[monthKey] += saleTotal;
       }
@@ -144,7 +145,8 @@ const Dashboard = () => {
             };
           }
           
-          const revenue = item.price * item.quantity;
+          // Fix: Change item.price to item.unitPrice
+          const revenue = item.unitPrice * item.quantity;
           const cost = product.costPrice ? product.costPrice * item.quantity : 0;
           const profit = revenue - cost;
           
@@ -176,7 +178,8 @@ const Dashboard = () => {
           
           let saleTotal = 0;
           sale.items.forEach(item => {
-            saleTotal += item.price * item.quantity;
+            // Fix: Change item.price to item.unitPrice
+            saleTotal += item.unitPrice * item.quantity;
           });
           
           locationData[location.id].revenue += saleTotal;
@@ -202,7 +205,7 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center justify-between">
-              <span>{language === 'en' ? 'Locations' : 'Ubicaciones'}</span>
+              <span>{translations.navbar.locations}</span>
               <Store className="h-5 w-5 text-vendora-600" />
             </CardTitle>
           </CardHeader>
@@ -219,7 +222,7 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center justify-between">
-              <span>{language === 'en' ? 'Products' : 'Productos'}</span>
+              <span>{translations.navbar.products}</span>
               <Package className="h-5 w-5 text-vendora-600" />
             </CardTitle>
           </CardHeader>
@@ -236,7 +239,7 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center justify-between">
-              <span>{language === 'en' ? 'Deliveries' : 'Entregas'}</span>
+              <span>{translations.navbar.deliveries}</span>
               <Truck className="h-5 w-5 text-vendora-600" />
             </CardTitle>
           </CardHeader>
@@ -257,7 +260,7 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center justify-between">
-              <span>{language === 'en' ? 'Orders' : 'Pedidos'}</span>
+              <span>{translations.navbar.salesOrders}</span>
               <ShoppingCart className="h-5 w-5 text-vendora-600" />
             </CardTitle>
           </CardHeader>
@@ -287,11 +290,9 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>{language === 'en' ? 'Top Selling Products' : 'Productos Más Vendidos'}</CardTitle>
+            <CardTitle>{translations.dashboard.topSellingProducts}</CardTitle>
             <CardDescription>
-              {language === 'en' 
-                ? 'Products with the highest sales volume' 
-                : 'Productos con el mayor volumen de ventas'}
+              {translations.dashboard.topSellingProductsDescription}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -306,14 +307,14 @@ const Dashboard = () => {
                       <span>{product.name}</span>
                     </div>
                     <div className="text-sm font-medium">
-                      {product.quantitySold} {language === 'en' ? 'sold' : 'vendidos'}
+                      {product.quantitySold} {translations.dashboard.sold}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-6 text-muted-foreground">
-                {language === 'en' ? 'No sales recorded yet' : 'Aún no se han registrado ventas'}
+                {translations.dashboard.noSalesRecorded}
               </div>
             )}
           </CardContent>
@@ -321,9 +322,9 @@ const Dashboard = () => {
 
         <Card className="card-gradient text-white">
           <CardHeader>
-            <CardTitle>{language === 'en' ? 'Quick Access' : 'Acceso Rápido'}</CardTitle>
+            <CardTitle>{translations.dashboard.quickAccess}</CardTitle>
             <CardDescription className="text-white/90">
-              {language === 'en' ? 'Common tasks to get started' : 'Tareas comunes para comenzar'}
+              {translations.dashboard.quickAccessDescription}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -331,7 +332,7 @@ const Dashboard = () => {
               <Link to="/locations/new">
                 <Button variant="secondary" className="w-full justify-start">
                   <Store className="mr-2 h-4 w-4" />
-                  {language === 'en' ? 'Add New Location' : 'Añadir Nueva Ubicación'}
+                  {translations.dashboard.addNewLocation}
                 </Button>
               </Link>
             </div>
@@ -339,7 +340,7 @@ const Dashboard = () => {
               <Link to="/products/new">
                 <Button variant="secondary" className="w-full justify-start">
                   <Package className="mr-2 h-4 w-4" />
-                  {language === 'en' ? 'Add New Product' : 'Añadir Nuevo Producto'}
+                  {translations.dashboard.addNewProduct}
                 </Button>
               </Link>
             </div>
@@ -347,7 +348,7 @@ const Dashboard = () => {
               <Link to="/deliveries/new">
                 <Button variant="secondary" className="w-full justify-start">
                   <Truck className="mr-2 h-4 w-4" />
-                  {language === 'en' ? 'Record Delivery' : 'Registrar Entrega'}
+                  {translations.dashboard.recordDelivery}
                 </Button>
               </Link>
             </div>
@@ -355,7 +356,7 @@ const Dashboard = () => {
               <Link to="/sales-orders/new-sale">
                 <Button variant="secondary" className="w-full justify-start">
                   <ShoppingCart className="mr-2 h-4 w-4" />
-                  {language === 'en' ? 'Record Sale' : 'Registrar Venta'}
+                  {translations.dashboard.recordSale}
                 </Button>
               </Link>
             </div>
