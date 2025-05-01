@@ -44,7 +44,8 @@ const LocationForm = ({ location, isNew, onClose, onSave, onDelete }: LocationFo
     e.preventDefault();
     
     if (!currentLocation.name || !currentLocation.address) {
-      toast.error(translations.common.requiredFields);
+      // Fix: Use the existing 'required' property instead of 'requiredFields'
+      toast.error(translations.common.required);
       return;
     }
     
