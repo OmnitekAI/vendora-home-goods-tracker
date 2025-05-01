@@ -119,7 +119,9 @@ const Locations = () => {
         )}
 
         {/* Add/Edit Location Dialog */}
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          if (!open) handleCloseDialog();
+        }}>
           <LocationForm
             location={currentLocation}
             isNew={id === "new"}

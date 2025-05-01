@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Location } from "@/types";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,12 @@ interface LocationFormProps {
 
 const LocationForm = ({ location, isNew, onClose, onSave, onDelete }: LocationFormProps) => {
   const { translations } = useLanguage();
-  const [currentLocation, setCurrentLocation] = React.useState<Location>(location);
+  const [currentLocation, setCurrentLocation] = useState<Location>(location);
+  
+  // Sync with prop changes
+  useEffect(() => {
+    setCurrentLocation(location);
+  }, [location]);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -39,7 +44,7 @@ const LocationForm = ({ location, isNew, onClose, onSave, onDelete }: LocationFo
     e.preventDefault();
     
     if (!currentLocation.name || !currentLocation.address) {
-      toast.error("Name and address are required");
+      toast.error(translations.common.requiredFields);
       return;
     }
     

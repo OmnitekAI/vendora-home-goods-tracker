@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Product } from "@/types";
 import { deleteProduct, saveProduct } from "@/utils/dataStorage";
@@ -47,6 +47,12 @@ export const ProductDialog = ({
   const navigate = useNavigate();
   const [currentProduct, setCurrentProduct] = useState<Product>(product);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  
+  // Sync with prop changes
+  useEffect(() => {
+    setCurrentProduct(product);
+  }, [product]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -57,6 +63,19 @@ export const ProductDialog = ({
   };
 
   const handleCategoryChange = (value: string) => {
+    if (value === "new") {
+      setNewCategory("");
+    } else {
+      setCurrentProduct((prev) => ({
+        ...prev,
+        category: value,
+      }));
+    }
+  };
+
+  const handleNewCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setNewCategory(value);
     setCurrentProduct((prev) => ({
       ...prev,
       category: value,
@@ -84,6 +103,9 @@ export const ProductDialog = ({
     onClose();
     navigate("/products");
   };
+
+  // Determine if we're using a new category (not in the list)
+  const isNewCategory = currentProduct.category && !categories.includes(currentProduct.category);
 
   return (
     <>
@@ -114,9 +136,9 @@ export const ProductDialog = ({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="category">{translations.products.category}</Label>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2">
                   <Select
-                    value={currentProduct.category}
+                    value={isNewCategory ? "new" : currentProduct.category}
                     onValueChange={handleCategoryChange}
                   >
                     <SelectTrigger>
@@ -128,13 +150,17 @@ export const ProductDialog = ({
                           {cat}
                         </SelectItem>
                       ))}
+                      <SelectItem value="new">
+                        {translations.products.addNewCategory}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
-                  {!categories.includes(currentProduct.category) && currentProduct.category && (
+                  
+                  {(isNewCategory || currentProduct.category === "new") && (
                     <Input
-                      name="category"
-                      value={currentProduct.category}
-                      onChange={handleChange}
+                      name="newCategory"
+                      value={isNewCategory ? currentProduct.category : newCategory}
+                      onChange={handleNewCategoryChange}
                       placeholder={translations.products.addNewCategory}
                     />
                   )}

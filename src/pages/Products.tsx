@@ -132,7 +132,9 @@ const Products = () => {
 
         <ProductDialog
           isOpen={isDialogOpen}
-          onClose={handleCloseDialog}
+          onClose={() => {
+            handleCloseDialog();
+          }}
           product={currentProduct}
           categories={categories}
           isNew={id === "new"}
