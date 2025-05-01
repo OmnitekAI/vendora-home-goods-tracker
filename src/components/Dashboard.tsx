@@ -5,8 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Store, Package, Truck, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getLocations, getProducts, getDeliveries, getOrders, getSales } from "@/utils/dataStorage";
+import DashboardCharts from "./dashboard/DashboardCharts";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Dashboard = () => {
+  const { language } = useLanguage();
   const [stats, setStats] = useState({
     locationCount: 0,
     productCount: 0,
@@ -17,6 +20,30 @@ const Dashboard = () => {
     unpaidDeliveries: 0,
     topProducts: [] as { id: string, name: string, quantitySold: number }[],
   });
+
+  // Chart data
+  const [chartData, setChartData] = useState({
+    monthlyRevenueData: [] as Array<{ month: string; revenue: number }>,
+    productDistributionData: [] as Array<{ 
+      name: string; 
+      revenue: number; 
+      profit: number; 
+      quantity: number 
+    }>,
+    locationPerformanceData: [] as Array<{ 
+      name: string; 
+      revenue: number; 
+      count: number 
+    }>,
+  });
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat(language === 'en' ? 'en-US' : 'es-ES', {
+      style: 'currency',
+      currency: language === 'en' ? 'USD' : 'EUR',
+      maximumFractionDigits: 2
+    }).format(amount);
+  };
 
   useEffect(() => {
     // Load statistics
@@ -63,7 +90,111 @@ const Dashboard = () => {
       unpaidDeliveries,
       topProducts,
     });
-  }, []);
+
+    // Prepare chart data
+    // Monthly Revenue Data
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+    
+    const monthlyRevenue: Record<string, number> = {};
+    const months = [];
+    
+    for (let i = 0; i < 6; i++) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      months.unshift(monthKey);
+      monthlyRevenue[monthKey] = 0;
+    }
+    
+    sales.forEach(sale => {
+      const saleDate = new Date(sale.date);
+      const monthKey = `${saleDate.getFullYear()}-${String(saleDate.getMonth() + 1).padStart(2, '0')}`;
+      
+      if (monthlyRevenue[monthKey] !== undefined) {
+        let saleTotal = 0;
+        sale.items.forEach(item => {
+          saleTotal += item.price * item.quantity;
+        });
+        monthlyRevenue[monthKey] += saleTotal;
+      }
+    });
+    
+    const monthlyRevenueData = months.map(month => {
+      const date = new Date(month + '-01');
+      return {
+        month: date.toLocaleString(language === 'en' ? 'en-US' : 'es-ES', { month: 'short' }),
+        revenue: monthlyRevenue[month] || 0
+      };
+    });
+
+    // Product Distribution Data
+    const productData: Record<string, { name: string; revenue: number; profit: number; quantity: number }> = {};
+    
+    sales.forEach(sale => {
+      sale.items.forEach(item => {
+        const product = products.find(p => p.id === item.productId);
+        if (product) {
+          if (!productData[product.id]) {
+            productData[product.id] = {
+              name: product.name,
+              revenue: 0,
+              profit: 0,
+              quantity: 0
+            };
+          }
+          
+          const revenue = item.price * item.quantity;
+          const cost = product.costPrice ? product.costPrice * item.quantity : 0;
+          const profit = revenue - cost;
+          
+          productData[product.id].revenue += revenue;
+          productData[product.id].profit += profit;
+          productData[product.id].quantity += item.quantity;
+        }
+      });
+    });
+    
+    const productDistributionData = Object.values(productData)
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 5);
+
+    // Location Performance Data
+    const locationData: Record<string, { name: string; revenue: number; count: number }> = {};
+    
+    sales.forEach(sale => {
+      if (sale.locationId) {
+        const location = locations.find(l => l.id === sale.locationId);
+        if (location) {
+          if (!locationData[location.id]) {
+            locationData[location.id] = {
+              name: location.name,
+              revenue: 0,
+              count: 0
+            };
+          }
+          
+          let saleTotal = 0;
+          sale.items.forEach(item => {
+            saleTotal += item.price * item.quantity;
+          });
+          
+          locationData[location.id].revenue += saleTotal;
+          locationData[location.id].count += 1;
+        }
+      }
+    });
+    
+    const locationPerformanceData = Object.values(locationData)
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 5);
+
+    setChartData({
+      monthlyRevenueData,
+      productDistributionData,
+      locationPerformanceData
+    });
+  }, [language]);
 
   return (
     <div className="space-y-6">
@@ -71,14 +202,16 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center justify-between">
-              <span>Locations</span>
+              <span>{language === 'en' ? 'Locations' : 'Ubicaciones'}</span>
               <Store className="h-5 w-5 text-vendora-600" />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{stats.locationCount}</div>
             <Link to="/locations">
-              <Button variant="link" className="p-0 h-auto text-vendora-600">Manage locations</Button>
+              <Button variant="link" className="p-0 h-auto text-vendora-600">
+                {language === 'en' ? 'Manage locations' : 'Gestionar ubicaciones'}
+              </Button>
             </Link>
           </CardContent>
         </Card>
@@ -86,14 +219,16 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center justify-between">
-              <span>Products</span>
+              <span>{language === 'en' ? 'Products' : 'Productos'}</span>
               <Package className="h-5 w-5 text-vendora-600" />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{stats.productCount}</div>
             <Link to="/products">
-              <Button variant="link" className="p-0 h-auto text-vendora-600">Manage products</Button>
+              <Button variant="link" className="p-0 h-auto text-vendora-600">
+                {language === 'en' ? 'Manage products' : 'Gestionar productos'}
+              </Button>
             </Link>
           </CardContent>
         </Card>
@@ -101,14 +236,20 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center justify-between">
-              <span>Deliveries</span>
+              <span>{language === 'en' ? 'Deliveries' : 'Entregas'}</span>
               <Truck className="h-5 w-5 text-vendora-600" />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{stats.deliveryCount}</div>
             <p className="text-sm text-muted-foreground">
-              {stats.unpaidDeliveries > 0 ? `${stats.unpaidDeliveries} unpaid` : "All paid"}
+              {stats.unpaidDeliveries > 0 
+                ? language === 'en' 
+                  ? `${stats.unpaidDeliveries} unpaid` 
+                  : `${stats.unpaidDeliveries} sin pagar`
+                : language === 'en' 
+                  ? "All paid" 
+                  : "Todo pagado"}
             </p>
           </CardContent>
         </Card>
@@ -116,24 +257,42 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center justify-between">
-              <span>Orders</span>
+              <span>{language === 'en' ? 'Orders' : 'Pedidos'}</span>
               <ShoppingCart className="h-5 w-5 text-vendora-600" />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{stats.orderCount}</div>
             <p className="text-sm text-muted-foreground">
-              {stats.pendingOrders > 0 ? `${stats.pendingOrders} pending` : "No pending orders"}
+              {stats.pendingOrders > 0 
+                ? language === 'en' 
+                  ? `${stats.pendingOrders} pending` 
+                  : `${stats.pendingOrders} pendientes`
+                : language === 'en' 
+                  ? "No pending orders" 
+                  : "Sin pedidos pendientes"}
             </p>
           </CardContent>
         </Card>
       </div>
 
+      {/* Data Visualization Dashboard */}
+      <DashboardCharts 
+        monthlyRevenueData={chartData.monthlyRevenueData}
+        productDistributionData={chartData.productDistributionData}
+        locationPerformanceData={chartData.locationPerformanceData}
+        formatCurrency={formatCurrency}
+      />
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Top Selling Products</CardTitle>
-            <CardDescription>Products with the highest sales volume</CardDescription>
+            <CardTitle>{language === 'en' ? 'Top Selling Products' : 'Productos Más Vendidos'}</CardTitle>
+            <CardDescription>
+              {language === 'en' 
+                ? 'Products with the highest sales volume' 
+                : 'Productos con el mayor volumen de ventas'}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {stats.topProducts.length > 0 ? (
@@ -147,14 +306,14 @@ const Dashboard = () => {
                       <span>{product.name}</span>
                     </div>
                     <div className="text-sm font-medium">
-                      {product.quantitySold} sold
+                      {product.quantitySold} {language === 'en' ? 'sold' : 'vendidos'}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-6 text-muted-foreground">
-                No sales recorded yet
+                {language === 'en' ? 'No sales recorded yet' : 'Aún no se han registrado ventas'}
               </div>
             )}
           </CardContent>
@@ -162,9 +321,9 @@ const Dashboard = () => {
 
         <Card className="card-gradient text-white">
           <CardHeader>
-            <CardTitle>Quick Access</CardTitle>
+            <CardTitle>{language === 'en' ? 'Quick Access' : 'Acceso Rápido'}</CardTitle>
             <CardDescription className="text-white/90">
-              Common tasks to get started
+              {language === 'en' ? 'Common tasks to get started' : 'Tareas comunes para comenzar'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -172,7 +331,7 @@ const Dashboard = () => {
               <Link to="/locations/new">
                 <Button variant="secondary" className="w-full justify-start">
                   <Store className="mr-2 h-4 w-4" />
-                  Add New Location
+                  {language === 'en' ? 'Add New Location' : 'Añadir Nueva Ubicación'}
                 </Button>
               </Link>
             </div>
@@ -180,7 +339,7 @@ const Dashboard = () => {
               <Link to="/products/new">
                 <Button variant="secondary" className="w-full justify-start">
                   <Package className="mr-2 h-4 w-4" />
-                  Add New Product
+                  {language === 'en' ? 'Add New Product' : 'Añadir Nuevo Producto'}
                 </Button>
               </Link>
             </div>
@@ -188,7 +347,7 @@ const Dashboard = () => {
               <Link to="/deliveries/new">
                 <Button variant="secondary" className="w-full justify-start">
                   <Truck className="mr-2 h-4 w-4" />
-                  Record Delivery
+                  {language === 'en' ? 'Record Delivery' : 'Registrar Entrega'}
                 </Button>
               </Link>
             </div>
@@ -196,7 +355,7 @@ const Dashboard = () => {
               <Link to="/sales-orders/new-sale">
                 <Button variant="secondary" className="w-full justify-start">
                   <ShoppingCart className="mr-2 h-4 w-4" />
-                  Record Sale
+                  {language === 'en' ? 'Record Sale' : 'Registrar Venta'}
                 </Button>
               </Link>
             </div>
