@@ -114,8 +114,8 @@ const Dashboard = () => {
       if (monthlyRevenue[monthKey] !== undefined) {
         let saleTotal = 0;
         sale.items.forEach(item => {
-          // Fix: Change item.price to item.unitPrice
-          saleTotal += item.unitPrice * item.quantity;
+          // Fixed: Changed item.unitPrice to item.pricePerUnit
+          saleTotal += item.pricePerUnit * item.quantity;
         });
         monthlyRevenue[monthKey] += saleTotal;
       }
@@ -145,8 +145,8 @@ const Dashboard = () => {
             };
           }
           
-          // Fix: Change item.price to item.unitPrice
-          const revenue = item.unitPrice * item.quantity;
+          // Fixed: Changed item.unitPrice to item.pricePerUnit
+          const revenue = item.pricePerUnit * item.quantity;
           const cost = product.costPrice ? product.costPrice * item.quantity : 0;
           const profit = revenue - cost;
           
@@ -178,8 +178,8 @@ const Dashboard = () => {
           
           let saleTotal = 0;
           sale.items.forEach(item => {
-            // Fix: Change item.price to item.unitPrice
-            saleTotal += item.unitPrice * item.quantity;
+            // Fixed: Changed item.unitPrice to item.pricePerUnit
+            saleTotal += item.pricePerUnit * item.quantity;
           });
           
           locationData[location.id].revenue += saleTotal;
@@ -368,3 +368,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
