@@ -67,7 +67,7 @@ export const ProductDialog = ({
     e.preventDefault();
     
     if (!currentProduct.name) {
-      toast.error(translations.products.productName + " " + translations.common.required);
+      toast.error(`${translations.products.productName} ${translations.common.required}`);
       return;
     }
     

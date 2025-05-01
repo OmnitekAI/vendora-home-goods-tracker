@@ -1,4 +1,3 @@
-
 export const english = {
   app: {
     title: "Vendora",
@@ -14,6 +13,7 @@ export const english = {
     confirmDelete: "Are you sure you want to delete this? This action cannot be undone.",
     noData: "No data available",
     loading: "Loading...",
+    required: "is required", // Added the missing translation
   },
   dashboard: {
     welcome: "Welcome to Vendora",

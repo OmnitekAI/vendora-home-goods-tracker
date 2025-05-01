@@ -1,4 +1,3 @@
-
 export const spanish = {
   app: {
     title: "Vendora",
@@ -14,6 +13,7 @@ export const spanish = {
     confirmDelete: "¿Está seguro de eliminar esto? Esta acción no se puede deshacer.",
     noData: "No hay datos disponibles",
     loading: "Cargando...",
+    required: "es requerido", // Added the missing translation
   },
   dashboard: {
     welcome: "Bienvenido a Vendora",
