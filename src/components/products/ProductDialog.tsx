@@ -1,0 +1,224 @@
+
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Product } from "@/types";
+import { deleteProduct, saveProduct } from "@/utils/dataStorage";
+import { toast } from "@/components/ui/sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { ProductDeleteDialog } from "./ProductDeleteDialog";
+
+interface ProductDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  product: Product;
+  categories: string[];
+  isNew: boolean;
+  onSave: () => void;
+}
+
+export const ProductDialog = ({
+  isOpen,
+  onClose,
+  product,
+  categories,
+  isNew,
+  onSave,
+}: ProductDialogProps) => {
+  const navigate = useNavigate();
+  const [currentProduct, setCurrentProduct] = useState<Product>(product);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setCurrentProduct((prev) => ({
+      ...prev,
+      [name]: name.includes("Price") ? parseFloat(value) || 0 : value,
+    }));
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setCurrentProduct((prev) => ({
+      ...prev,
+      category: value,
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!currentProduct.name) {
+      toast.error("Product name is required");
+      return;
+    }
+    
+    saveProduct(currentProduct);
+    onSave();
+    onClose();
+    navigate("/products");
+  };
+
+  const handleDelete = () => {
+    deleteProduct(currentProduct.id);
+    onSave();
+    setIsDeleteDialogOpen(false);
+    onClose();
+    navigate("/products");
+  };
+
+  return (
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md">
+          <form onSubmit={handleSubmit}>
+            <DialogHeader>
+              <DialogTitle>
+                {isNew ? "Add New Product" : "Edit Product"}
+              </DialogTitle>
+              <DialogDescription>
+                {isNew
+                  ? "Enter the details for the new product."
+                  : "Update the details for this product."}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Product Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={currentProduct.name}
+                  onChange={handleChange}
+                  placeholder="Chocolate Chip Cookies"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="category">Category</Label>
+                <div className="flex gap-2">
+                  <Select
+                    value={currentProduct.category}
+                    onValueChange={handleCategoryChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {!categories.includes(currentProduct.category) && currentProduct.category && (
+                    <Input
+                      name="category"
+                      value={currentProduct.category}
+                      onChange={handleChange}
+                      placeholder="Add new category"
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="costPrice">Cost Price</Label>
+                <Input
+                  id="costPrice"
+                  name="costPrice"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={currentProduct.costPrice}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="wholesalePrice">Wholesale Price</Label>
+                <Input
+                  id="wholesalePrice"
+                  name="wholesalePrice"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={currentProduct.wholesalePrice}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="suggestedRetailPrice">Suggested Retail Price</Label>
+                <Input
+                  id="suggestedRetailPrice"
+                  name="suggestedRetailPrice"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={currentProduct.suggestedRetailPrice}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={currentProduct.description || ""}
+                  onChange={handleChange}
+                  placeholder="Product description..."
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter className="flex items-center justify-between">
+              <div>
+                {!isNew && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => setIsDeleteDialogOpen(true)}
+                  >
+                    Delete
+                  </Button>
+                )}
+              </div>
+              <div className="flex space-x-2">
+                <Button type="button" variant="outline" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button type="submit" className="bg-vendora-600 hover:bg-vendora-700">
+                  {isNew ? "Add Product" : "Update Product"}
+                </Button>
+              </div>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <ProductDeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onDelete={handleDelete}
+      />
+    </>
+  );
+};
