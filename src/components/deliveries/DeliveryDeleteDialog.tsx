@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface DeliveryDeleteDialogProps {
   isOpen: boolean;
@@ -20,13 +21,15 @@ export const DeliveryDeleteDialog = ({
   onOpenChange,
   onDelete,
 }: DeliveryDeleteDialogProps) => {
+  const { translations } = useLanguage();
+  
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Confirm Deletion</DialogTitle>
+          <DialogTitle>{translations.common.confirmDelete}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this delivery? This action cannot be undone.
+            {translations.common.confirmDelete}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -34,7 +37,7 @@ export const DeliveryDeleteDialog = ({
             variant="outline"
             onClick={() => onOpenChange(false)}
           >
-            Cancel
+            {translations.common.cancel}
           </Button>
           <Button
             variant="destructive"
@@ -43,7 +46,7 @@ export const DeliveryDeleteDialog = ({
               onOpenChange(false);
             }}
           >
-            Delete
+            {translations.common.delete}
           </Button>
         </DialogFooter>
       </DialogContent>

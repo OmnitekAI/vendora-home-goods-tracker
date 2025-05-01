@@ -17,8 +17,10 @@ import {
 import { EmptyDeliveries } from "@/components/deliveries/EmptyDeliveries";
 import { DeliveryCard } from "@/components/deliveries/DeliveryCard";
 import { DeliveryDialog } from "@/components/deliveries/DeliveryDialog";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Deliveries = () => {
+  const { translations } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
@@ -126,10 +128,10 @@ const Deliveries = () => {
       <Navbar />
       <main className="flex-1 py-8 vendora-container">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-vendora-800">Deliveries</h1>
+          <h1 className="text-3xl font-bold text-vendora-800">{translations.deliveries.title}</h1>
           <Button onClick={handleAddNew} className="bg-vendora-600 hover:bg-vendora-700">
             <Plus className="mr-2 h-4 w-4" />
-            Add Delivery
+            {translations.deliveries.addDelivery}
           </Button>
         </div>
 

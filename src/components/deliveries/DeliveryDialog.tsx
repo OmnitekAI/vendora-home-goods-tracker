@@ -19,6 +19,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Plus, X } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { getProductName } from "@/utils/dataStorage";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface DeliveryDialogProps {
   isOpen: boolean;
@@ -43,6 +44,7 @@ export const DeliveryDialog = ({
   onDelete,
   formatCurrency,
 }: DeliveryDialogProps) => {
+  const { translations } = useLanguage();
   const [delivery, setDelivery] = useState<Delivery>(currentDelivery);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [newItem, setNewItem] = useState<DeliveryItem>({
@@ -146,18 +148,18 @@ export const DeliveryDialog = ({
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle>
-                {isNew ? "Record New Delivery" : "Edit Delivery"}
+                {isNew ? translations.deliveries.addDelivery : translations.deliveries.editDelivery}
               </DialogTitle>
               <DialogDescription>
                 {isNew
-                  ? "Record a new delivery to a point of sale location."
-                  : "Update the details for this delivery."}
+                  ? translations.deliveries.addDeliveryDescription
+                  : translations.deliveries.editDeliveryDescription}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="locationId">Location</Label>
+                  <Label htmlFor="locationId">{translations.locations.title}</Label>
                   <Select
                     value={delivery.locationId}
                     onValueChange={(value) =>
@@ -177,7 +179,7 @@ export const DeliveryDialog = ({
                   </Select>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="date">Date</Label>
+                  <Label htmlFor="date">{translations.deliveries.date}</Label>
                   <Input
                     id="date"
                     name="date"
@@ -190,7 +192,7 @@ export const DeliveryDialog = ({
               </div>
 
               <div className="space-y-2">
-                <Label>Products</Label>
+                <Label>{translations.products.title}</Label>
                 <Card>
                   <CardContent className="p-4">
                     {/* Add new item form */}
@@ -200,7 +202,7 @@ export const DeliveryDialog = ({
                         onValueChange={handleProductChange}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Product" />
+                          <SelectValue placeholder={translations.deliveries.product} />
                         </SelectTrigger>
                         <SelectContent>
                           {products.map((product) => (
@@ -221,7 +223,7 @@ export const DeliveryDialog = ({
                               quantity: parseInt(e.target.value) || 0,
                             })
                           }
-                          placeholder="Qty"
+                          placeholder={translations.deliveries.quantity}
                           className="w-20"
                         />
                         <Input
@@ -235,7 +237,7 @@ export const DeliveryDialog = ({
                               pricePerUnit: parseFloat(e.target.value) || 0,
                             })
                           }
-                          placeholder="Price"
+                          placeholder={translations.deliveries.price}
                           className="flex-1"
                         />
                         <Button
@@ -251,7 +253,7 @@ export const DeliveryDialog = ({
                     {/* Items list */}
                     {delivery.items.length === 0 ? (
                       <div className="text-center py-4 text-muted-foreground">
-                        No products added yet
+                        {translations.common.noData}
                       </div>
                     ) : (
                       <div className="space-y-2">
@@ -277,7 +279,7 @@ export const DeliveryDialog = ({
                           </div>
                         ))}
                         <div className="flex justify-between font-medium pt-2">
-                          <div>Total:</div>
+                          <div>{translations.deliveries.total}:</div>
                           <div>{formatCurrency(calculateTotal(delivery.items))}</div>
                         </div>
                       </div>
@@ -287,7 +289,7 @@ export const DeliveryDialog = ({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="notes">Notes</Label>
+                <Label htmlFor="notes">{translations.locations.notes}</Label>
                 <Textarea
                   id="notes"
                   name="notes"
@@ -309,7 +311,7 @@ export const DeliveryDialog = ({
                     })
                   }
                 />
-                <Label htmlFor="isPaid">Mark as paid</Label>
+                <Label htmlFor="isPaid">{translations.deliveries.isPaid}</Label>
               </div>
             </div>
             <DialogFooter className="flex items-center justify-between">
@@ -320,16 +322,16 @@ export const DeliveryDialog = ({
                     variant="destructive"
                     onClick={() => setIsDeleteDialogOpen(true)}
                   >
-                    Delete
+                    {translations.common.delete}
                   </Button>
                 )}
               </div>
               <div className="flex space-x-2">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                  Cancel
+                  {translations.common.cancel}
                 </Button>
                 <Button type="submit" className="bg-vendora-600 hover:bg-vendora-700">
-                  {isNew ? "Record Delivery" : "Update Delivery"}
+                  {isNew ? translations.deliveries.recordDelivery : translations.common.save}
                 </Button>
               </div>
             </DialogFooter>
@@ -340,9 +342,9 @@ export const DeliveryDialog = ({
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogTitle>{translations.common.confirmDelete}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this delivery? This action cannot be undone.
+              {translations.common.confirmDelete}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -350,7 +352,7 @@ export const DeliveryDialog = ({
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
             >
-              Cancel
+              {translations.common.cancel}
             </Button>
             <Button
               variant="destructive"
@@ -359,7 +361,7 @@ export const DeliveryDialog = ({
                 setIsDeleteDialogOpen(false);
               }}
             >
-              Delete
+              {translations.common.delete}
             </Button>
           </DialogFooter>
         </DialogContent>

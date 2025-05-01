@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Store, Calendar, Edit } from "lucide-react";
 import { Delivery, DeliveryItem } from "@/types";
 import { getLocationName, getProductName } from "@/utils/dataStorage";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface DeliveryCardProps {
   delivery: Delivery;
@@ -18,6 +19,8 @@ export const DeliveryCard = ({
   formatCurrency, 
   formatDate 
 }: DeliveryCardProps) => {
+  const { translations } = useLanguage();
+  
   const calculateTotal = (items: DeliveryItem[]) => {
     return items.reduce((sum, item) => sum + item.quantity * item.pricePerUnit, 0);
   };
@@ -53,7 +56,7 @@ export const DeliveryCard = ({
           ))}
         </div>
         <div className="mt-4 pt-2 border-t border-border flex justify-between font-medium">
-          <div>Total:</div>
+          <div>{translations.deliveries.total}:</div>
           <div>{formatCurrency(calculateTotal(delivery.items))}</div>
         </div>
       </CardContent>
@@ -62,12 +65,12 @@ export const DeliveryCard = ({
           {delivery.isPaid ? (
             <span className="text-sm text-green-600 font-medium flex items-center gap-1">
               <span className="h-2 w-2 bg-green-600 rounded-full"></span>
-              Paid
+              {translations.deliveries.paid}
             </span>
           ) : (
             <span className="text-sm text-amber-600 font-medium flex items-center gap-1">
               <span className="h-2 w-2 bg-amber-600 rounded-full"></span>
-              Unpaid
+              {translations.deliveries.unpaid}
             </span>
           )}
         </div>
