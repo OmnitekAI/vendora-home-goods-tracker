@@ -10,8 +10,10 @@ import { getProducts, generateId } from "@/utils/dataStorage";
 import { ProductDialog } from "@/components/products/ProductDialog";
 import { ProductCategory } from "@/components/products/ProductCategory";
 import { EmptyProducts } from "@/components/products/EmptyProducts";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Products = () => {
+  const { translations } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
@@ -52,10 +54,10 @@ const Products = () => {
         setIsDialogOpen(true);
       } else {
         navigate("/products");
-        toast.error("Product not found");
+        toast.error(translations.products.productName + " " + translations.common.noData);
       }
     }
-  }, [id, products, navigate]);
+  }, [id, products, navigate, translations]);
 
   useEffect(() => {
     // Extract unique categories
@@ -93,7 +95,7 @@ const Products = () => {
   // Group products by category
   const productsByCategory: Record<string, Product[]> = {};
   products.forEach((product) => {
-    const category = product.category || "Uncategorized";
+    const category = product.category || translations.products.uncategorized;
     if (!productsByCategory[category]) {
       productsByCategory[category] = [];
     }
@@ -105,10 +107,10 @@ const Products = () => {
       <Navbar />
       <main className="flex-1 py-8 vendora-container">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-vendora-800">Products</h1>
+          <h1 className="text-3xl font-bold text-vendora-800">{translations.products.title}</h1>
           <Button onClick={handleAddNew} className="bg-vendora-600 hover:bg-vendora-700">
             <Plus className="mr-2 h-4 w-4" />
-            Add Product
+            {translations.products.addProduct}
           </Button>
         </div>
 

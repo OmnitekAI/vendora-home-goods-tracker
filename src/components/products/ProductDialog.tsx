@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Product } from "@/types";
 import { deleteProduct, saveProduct } from "@/utils/dataStorage";
 import { toast } from "@/components/ui/sonner";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   Dialog,
   DialogContent,
@@ -42,6 +43,7 @@ export const ProductDialog = ({
   isNew,
   onSave,
 }: ProductDialogProps) => {
+  const { translations } = useLanguage();
   const navigate = useNavigate();
   const [currentProduct, setCurrentProduct] = useState<Product>(product);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -65,7 +67,7 @@ export const ProductDialog = ({
     e.preventDefault();
     
     if (!currentProduct.name) {
-      toast.error("Product name is required");
+      toast.error(translations.products.productName + " " + translations.common.required);
       return;
     }
     
@@ -90,35 +92,35 @@ export const ProductDialog = ({
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle>
-                {isNew ? "Add New Product" : "Edit Product"}
+                {isNew ? translations.products.addProduct : translations.products.editProduct}
               </DialogTitle>
               <DialogDescription>
                 {isNew
-                  ? "Enter the details for the new product."
-                  : "Update the details for this product."}
+                  ? translations.products.addProductDescription
+                  : translations.products.editProductDescription}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="name">Product Name</Label>
+                <Label htmlFor="name">{translations.products.productName}</Label>
                 <Input
                   id="name"
                   name="name"
                   value={currentProduct.name}
                   onChange={handleChange}
-                  placeholder="Chocolate Chip Cookies"
+                  placeholder={translations.products.productName}
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category">{translations.products.category}</Label>
                 <div className="flex gap-2">
                   <Select
                     value={currentProduct.category}
                     onValueChange={handleCategoryChange}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder={translations.products.selectCategory} />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((cat) => (
@@ -133,13 +135,13 @@ export const ProductDialog = ({
                       name="category"
                       value={currentProduct.category}
                       onChange={handleChange}
-                      placeholder="Add new category"
+                      placeholder={translations.products.addNewCategory}
                     />
                   )}
                 </div>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="costPrice">Cost Price</Label>
+                <Label htmlFor="costPrice">{translations.products.costPrice}</Label>
                 <Input
                   id="costPrice"
                   name="costPrice"
@@ -152,7 +154,7 @@ export const ProductDialog = ({
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="wholesalePrice">Wholesale Price</Label>
+                <Label htmlFor="wholesalePrice">{translations.products.wholesalePrice}</Label>
                 <Input
                   id="wholesalePrice"
                   name="wholesalePrice"
@@ -165,7 +167,7 @@ export const ProductDialog = ({
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="suggestedRetailPrice">Suggested Retail Price</Label>
+                <Label htmlFor="suggestedRetailPrice">{translations.products.suggestedRetailPrice}</Label>
                 <Input
                   id="suggestedRetailPrice"
                   name="suggestedRetailPrice"
@@ -178,13 +180,13 @@ export const ProductDialog = ({
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{translations.products.description}</Label>
                 <Textarea
                   id="description"
                   name="description"
                   value={currentProduct.description || ""}
                   onChange={handleChange}
-                  placeholder="Product description..."
+                  placeholder={translations.products.description}
                   rows={3}
                 />
               </div>
@@ -197,16 +199,16 @@ export const ProductDialog = ({
                     variant="destructive"
                     onClick={() => setIsDeleteDialogOpen(true)}
                   >
-                    Delete
+                    {translations.common.delete}
                   </Button>
                 )}
               </div>
               <div className="flex space-x-2">
                 <Button type="button" variant="outline" onClick={onClose}>
-                  Cancel
+                  {translations.common.cancel}
                 </Button>
                 <Button type="submit" className="bg-vendora-600 hover:bg-vendora-700">
-                  {isNew ? "Add Product" : "Update Product"}
+                  {isNew ? translations.products.addProduct : translations.common.save}
                 </Button>
               </div>
             </DialogFooter>

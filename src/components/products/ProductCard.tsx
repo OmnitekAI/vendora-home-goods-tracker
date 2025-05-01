@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Edit } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface ProductCardProps {
   product: Product;
@@ -16,6 +17,8 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product, onEdit, formatCurrency }: ProductCardProps) => {
+  const { translations } = useLanguage();
+  
   return (
     <Card key={product.id} className="overflow-hidden">
       <CardHeader className="pb-2 bg-vendora-50">
@@ -33,15 +36,15 @@ export const ProductCard = ({ product, onEdit, formatCurrency }: ProductCardProp
       <CardContent className="pt-4">
         <div className="space-y-2">
           <div className="flex justify-between">
-            <div className="text-sm font-medium text-muted-foreground">Cost</div>
+            <div className="text-sm font-medium text-muted-foreground">{translations.products.cost}</div>
             <div>{formatCurrency(product.costPrice)}</div>
           </div>
           <div className="flex justify-between">
-            <div className="text-sm font-medium text-muted-foreground">Wholesale</div>
+            <div className="text-sm font-medium text-muted-foreground">{translations.products.wholesale}</div>
             <div>{formatCurrency(product.wholesalePrice)}</div>
           </div>
           <div className="flex justify-between">
-            <div className="text-sm font-medium text-muted-foreground">Retail</div>
+            <div className="text-sm font-medium text-muted-foreground">{translations.products.retail}</div>
             <div>{formatCurrency(product.suggestedRetailPrice)}</div>
           </div>
           {product.description && (

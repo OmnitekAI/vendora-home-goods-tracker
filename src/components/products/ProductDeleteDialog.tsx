@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface ProductDeleteDialogProps {
   isOpen: boolean;
@@ -16,13 +17,15 @@ interface ProductDeleteDialogProps {
 }
 
 export const ProductDeleteDialog = ({ isOpen, onClose, onDelete }: ProductDeleteDialogProps) => {
+  const { translations } = useLanguage();
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Confirm Deletion</DialogTitle>
+          <DialogTitle>{translations.common.confirmDelete}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this product? This action cannot be undone.
+            {translations.common.confirmDelete}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -30,13 +33,13 @@ export const ProductDeleteDialog = ({ isOpen, onClose, onDelete }: ProductDelete
             variant="outline"
             onClick={onClose}
           >
-            Cancel
+            {translations.common.cancel}
           </Button>
           <Button
             variant="destructive"
             onClick={onDelete}
           >
-            Delete
+            {translations.common.delete}
           </Button>
         </DialogFooter>
       </DialogContent>
