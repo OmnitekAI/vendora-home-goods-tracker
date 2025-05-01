@@ -11,23 +11,26 @@ import {
   Upload, 
   Download, 
   Menu,
-  X
+  X,
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
 import { exportData, importData } from "@/utils/dataStorage";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Navbar = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { language, setLanguage, translations } = useLanguage();
 
   const navItems = [
-    { path: "/", label: "Dashboard", icon: <Store className="h-5 w-5" /> },
-    { path: "/locations", label: "Locations", icon: <Store className="h-5 w-5" /> },
-    { path: "/products", label: "Products", icon: <Package className="h-5 w-5" /> },
-    { path: "/deliveries", label: "Deliveries", icon: <Truck className="h-5 w-5" /> },
-    { path: "/sales-orders", label: "Sales & Orders", icon: <ShoppingCart className="h-5 w-5" /> },
-    { path: "/reports", label: "Reports", icon: <FileText className="h-5 w-5" /> },
+    { path: "/", label: translations.navbar.dashboard, icon: <Store className="h-5 w-5" /> },
+    { path: "/locations", label: translations.navbar.locations, icon: <Store className="h-5 w-5" /> },
+    { path: "/products", label: translations.navbar.products, icon: <Package className="h-5 w-5" /> },
+    { path: "/deliveries", label: translations.navbar.deliveries, icon: <Truck className="h-5 w-5" /> },
+    { path: "/sales-orders", label: translations.navbar.salesOrders, icon: <ShoppingCart className="h-5 w-5" /> },
+    { path: "/reports", label: translations.navbar.reports, icon: <FileText className="h-5 w-5" /> },
   ];
 
   const handleExport = () => {
@@ -75,6 +78,10 @@ const Navbar = () => {
     input.click();
   };
 
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'es' : 'en');
+  };
+
   return (
     <div className="sticky top-0 z-10 bg-background border-b border-border">
       <div className="vendora-container">
@@ -82,7 +89,7 @@ const Navbar = () => {
           {/* Logo and title */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <span className="text-2xl font-bold text-vendora-600">Vendora</span>
+              <span className="text-2xl font-bold text-vendora-600">{translations.app.title}</span>
             </Link>
           </div>
 
@@ -105,7 +112,7 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Export/Import buttons */}
+          {/* Export/Import/Language buttons */}
           <div className="hidden md:flex items-center space-x-2">
             <Button
               variant="outline"
@@ -114,7 +121,7 @@ const Navbar = () => {
               className="flex items-center gap-1"
             >
               <Download className="h-4 w-4" />
-              Export
+              {translations.common.export}
             </Button>
             <Button
               variant="outline"
@@ -123,7 +130,16 @@ const Navbar = () => {
               className="flex items-center gap-1"
             >
               <Upload className="h-4 w-4" />
-              Import
+              {translations.common.import}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleLanguage}
+              className="flex items-center gap-1"
+            >
+              <Globe className="h-4 w-4" />
+              {language === 'en' ? 'ES' : 'EN'}
             </Button>
           </div>
 
@@ -173,7 +189,7 @@ const Navbar = () => {
                 className="flex items-center gap-1 flex-1"
               >
                 <Download className="h-4 w-4" />
-                Export
+                {translations.common.export}
               </Button>
               <Button
                 variant="outline"
@@ -182,7 +198,18 @@ const Navbar = () => {
                 className="flex items-center gap-1 flex-1"
               >
                 <Upload className="h-4 w-4" />
-                Import
+                {translations.common.import}
+              </Button>
+            </div>
+            <div className="pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleLanguage}
+                className="flex items-center gap-1 w-full justify-center"
+              >
+                <Globe className="h-4 w-4" />
+                {language === 'en' ? 'Español' : 'English'}
               </Button>
             </div>
           </div>
