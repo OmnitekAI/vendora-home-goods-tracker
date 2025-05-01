@@ -1,0 +1,31 @@
+
+import { DataStore } from "@/types";
+import { toast } from "@/components/ui/sonner";
+import { loadData, saveData } from "./core";
+
+// Export/Import functions
+export const exportData = (): string => {
+  const data = loadData();
+  const exportStr = JSON.stringify(data);
+  return exportStr;
+};
+
+export const importData = (jsonString: string): boolean => {
+  try {
+    const data = JSON.parse(jsonString) as DataStore;
+    
+    // Basic validation
+    if (!data.locations || !data.products || !data.deliveries || 
+        !data.orders || !data.sales) {
+      throw new Error("Invalid data format");
+    }
+    
+    saveData(data);
+    toast.success("Data imported successfully");
+    return true;
+  } catch (error) {
+    console.error("Failed to import data:", error);
+    toast.error("Failed to import data: Invalid format");
+    return false;
+  }
+};

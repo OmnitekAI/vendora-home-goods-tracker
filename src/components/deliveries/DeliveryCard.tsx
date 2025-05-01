@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Store, Calendar, Edit } from "lucide-react";
 import { Delivery, DeliveryItem } from "@/types";
-import { getLocationName, getProductName } from "@/utils/dataStorage";
+import { getLocationName, getProductName } from "@/utils/storage";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface DeliveryCardProps {

@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Upload, Download } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
-import { exportData, importData } from "@/utils/dataStorage";
+import { exportData, importData } from "@/utils/storage";
 import { useLanguage } from "@/context/LanguageContext";
 
 export const DataActions = () => {

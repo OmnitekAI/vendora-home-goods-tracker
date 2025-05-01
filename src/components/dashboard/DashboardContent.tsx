@@ -1,11 +1,10 @@
-
 import { useEffect, useState } from "react";
 import StatsCards from "./StatsCards";
 import DashboardCharts from "./DashboardCharts";
 import TopProducts from "./TopProducts";
 import QuickAccess from "./QuickAccess";
 import { useLanguage } from "@/context/LanguageContext";
-import { getLocations, getProducts, getDeliveries, getOrders, getSales } from "@/utils/dataStorage";
+import { getLocations, getProducts, getDeliveries, getOrders, getSales } from "@/utils/storage";
 
 const DashboardContent = () => {
   const { language } = useLanguage();
