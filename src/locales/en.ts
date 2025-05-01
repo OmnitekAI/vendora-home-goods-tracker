@@ -1,4 +1,3 @@
-
 export const english = {
   app: {
     title: "Vendora",
@@ -14,7 +13,8 @@ export const english = {
     confirmDelete: "Are you sure you want to delete this? This action cannot be undone.",
     noData: "No data available",
     loading: "Loading...",
-    required: "is required", // Added the missing translation
+    required: "is required",
+    selectLocation: "Select a location", 
   },
   dashboard: {
     welcome: "Welcome to Vendora",
@@ -89,6 +89,7 @@ export const english = {
     total: "Total",
     addDeliveryDescription: "Record a new delivery to a point of sale location.",
     editDeliveryDescription: "Update the details for this delivery.",
+    selectLocation: "Select a location",
   },
   salesOrders: {
     title: "Sales & Orders",

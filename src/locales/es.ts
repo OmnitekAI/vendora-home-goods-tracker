@@ -1,4 +1,3 @@
-
 export const spanish = {
   app: {
     title: "Vendora",
@@ -14,7 +13,8 @@ export const spanish = {
     confirmDelete: "¿Está seguro de eliminar esto? Esta acción no se puede deshacer.",
     noData: "No hay datos disponibles",
     loading: "Cargando...",
-    required: "es requerido", // Added the missing translation
+    required: "es requerido",
+    selectLocation: "Seleccione una ubicación",
   },
   dashboard: {
     welcome: "Bienvenido a Vendora",
@@ -89,6 +89,7 @@ export const spanish = {
     total: "Total",
     addDeliveryDescription: "Registre una nueva entrega a un punto de venta.",
     editDeliveryDescription: "Actualice los detalles para esta entrega.",
+    selectLocation: "Seleccione una ubicación",
   },
   salesOrders: {
     title: "Ventas y Pedidos",

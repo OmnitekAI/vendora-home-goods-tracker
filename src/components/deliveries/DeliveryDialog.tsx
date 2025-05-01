@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Delivery, DeliveryItem, Location, Product } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -171,7 +170,7 @@ export const DeliveryDialog = ({
                     }
                   >
                     <SelectTrigger id="locationId">
-                      <SelectValue placeholder={translations.deliveries.selectLocation} />
+                      <SelectValue placeholder={translations.common.selectLocation} />
                     </SelectTrigger>
                     <SelectContent>
                       {hasValidLocations ? (
