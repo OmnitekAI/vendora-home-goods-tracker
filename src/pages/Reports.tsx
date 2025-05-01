@@ -1,11 +1,7 @@
 
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Store, ArrowRight, Calendar, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { 
   getLocations, 
   getProducts, 
@@ -16,9 +12,18 @@ import {
   getProductById
 } from "@/utils/dataStorage";
 import { Location, Product, Delivery, Sale } from "@/types";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from "recharts";
+import { useLanguage } from "@/context/LanguageContext";
+import {
+  ReportHeader,
+  SummaryCards,
+  MonthlyRevenueChart,
+  ProductPerformanceList,
+  ProductDistributionChart,
+  LocationPerformanceChart
+} from "@/components/reports";
 
 const Reports = () => {
+  const { translations } = useLanguage();
   const [locations, setLocations] = useState<Location[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
@@ -215,8 +220,6 @@ const Reports = () => {
     return Array.from(monthSet).sort((a, b) => b.localeCompare(a));
   };
 
-  const COLORS = ['#F5931D', '#B0C0A1', '#EACDA3', '#E87817', '#6E8657'];
-
   const handleExportCSV = () => {
     let csvContent = "data:text/csv;charset=utf-8,";
     
@@ -242,300 +245,58 @@ const Reports = () => {
       <Navbar />
       <main className="flex-1 py-8 vendora-container">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-vendora-800">Reports</h1>
+          <h1 className="text-3xl font-bold text-vendora-800">{translations.reports.title}</h1>
         </div>
         
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="md:w-1/3">
-            <div className="text-sm font-medium mb-1">Location</div>
-            <Select
-              value={selectedLocation}
-              onValueChange={setSelectedLocation}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="All Locations" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Locations</SelectItem>
-                {locations.map(location => (
-                  <SelectItem key={location.id} value={location.id}>
-                    {location.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="md:w-1/3">
-            <div className="text-sm font-medium mb-1">Month</div>
-            <Select
-              value={selectedMonth}
-              onValueChange={setSelectedMonth}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="All Months" />
-              </SelectTrigger>
-              <SelectContent>
-                {getMonths().map(month => (
-                  <SelectItem key={month} value={month}>
-                    {formatMonthYear(month)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="md:w-1/3 flex items-end">
-            <Button 
-              variant="outline" 
-              className="w-full flex items-center gap-2"
-              onClick={handleExportCSV}
-            >
-              <Download className="w-4 h-4" />
-              Export Report to CSV
-            </Button>
-          </div>
-        </div>
+        <ReportHeader
+          locations={locations}
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+          selectedMonth={selectedMonth}
+          setSelectedMonth={setSelectedMonth}
+          getMonths={getMonths}
+          formatMonthYear={formatMonthYear}
+          handleExportCSV={handleExportCSV}
+        />
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Total Revenue</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-vendora-600">
-                {formatCurrency(summaryData.totalRevenue)}
-              </div>
-              <p className="text-muted-foreground text-sm">
-                For selected period
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Total Profit</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-sage-600">
-                {formatCurrency(summaryData.profit)}
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Revenue minus costs
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Profit Margin</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-sage-600">
-                {summaryData.totalRevenue > 0
-                  ? `${((summaryData.profit / summaryData.totalRevenue) * 100).toFixed(1)}%`
-                  : "0%"}
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Profit as percentage of revenue
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        <SummaryCards 
+          summaryData={summaryData}
+          formatCurrency={formatCurrency}
+        />
         
         <Tabs defaultValue="revenue" className="w-full mb-8">
           <TabsList className="grid grid-cols-3 mb-6">
-            <TabsTrigger value="revenue">Revenue</TabsTrigger>
-            <TabsTrigger value="products">Products</TabsTrigger>
-            <TabsTrigger value="locations">Locations</TabsTrigger>
+            <TabsTrigger value="revenue">{translations.reports.revenue}</TabsTrigger>
+            <TabsTrigger value="products">{translations.reports.products}</TabsTrigger>
+            <TabsTrigger value="locations">{translations.reports.locations}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="revenue" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Monthly Revenue</CardTitle>
-                <CardDescription>
-                  Revenue trends over time
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {monthlyRevenueData.length > 0 ? (
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={monthlyRevenueData}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
-                        <YAxis 
-                          tickFormatter={(value) => 
-                            new Intl.NumberFormat('en-US', { 
-                              style: 'currency', 
-                              currency: 'USD',
-                              maximumFractionDigits: 0
-                            }).format(value)
-                          }
-                        />
-                        <Tooltip 
-                          formatter={(value) => [
-                            formatCurrency(value as number),
-                            "Revenue"
-                          ]}
-                        />
-                        <Legend />
-                        <Bar dataKey="revenue" fill="#F5931D" name="Revenue" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-muted-foreground">
-                    No revenue data available for the selected filters
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <MonthlyRevenueChart 
+              data={monthlyRevenueData} 
+              formatCurrency={formatCurrency} 
+            />
           </TabsContent>
           
           <TabsContent value="products" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Top Products by Revenue</CardTitle>
-                  <CardDescription>
-                    Highest performing products
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {productPerformanceData.length > 0 ? (
-                    <div className="space-y-4">
-                      {productPerformanceData.slice(0, 5).map((product, index) => (
-                        <div key={index} className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="bg-vendora-100 text-vendora-700 w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium">
-                              {index + 1}
-                            </div>
-                            <div>
-                              <div className="font-medium">{product.name}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {product.quantity} units sold
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="font-medium">{formatCurrency(product.revenue)}</div>
-                            <div className="text-sm text-sage-600">
-                              {formatCurrency(product.profit)} profit
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12 text-muted-foreground">
-                      No product data available for the selected filters
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <ProductPerformanceList 
+                data={productPerformanceData}
+                formatCurrency={formatCurrency}
+              />
               
-              <Card>
-                <CardHeader>
-                  <CardTitle>Product Sales Distribution</CardTitle>
-                  <CardDescription>
-                    Revenue percentage by product
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {productPerformanceData.length > 0 ? (
-                    <div className="h-[300px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={productPerformanceData.slice(0, 5)}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="revenue"
-                            nameKey="name"
-                            label={(entry) => entry.name}
-                          >
-                            {productPerformanceData.slice(0, 5).map((entry, index) => (
-                              <Cell 
-                                key={`cell-${index}`} 
-                                fill={COLORS[index % COLORS.length]} 
-                              />
-                            ))}
-                          </Pie>
-                          <Tooltip 
-                            formatter={(value) => [
-                              formatCurrency(value as number),
-                              "Revenue"
-                            ]}
-                          />
-                          <Legend />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  ) : (
-                    <div className="text-center py-12 text-muted-foreground">
-                      No product data available for the selected filters
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <ProductDistributionChart 
+                data={productPerformanceData}
+                formatCurrency={formatCurrency}
+              />
             </div>
           </TabsContent>
           
           <TabsContent value="locations" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Location Performance</CardTitle>
-                <CardDescription>
-                  Revenue by location
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {locationPerformanceData.length > 0 ? (
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={locationPerformanceData}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                        layout="vertical"
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis 
-                          type="number" 
-                          tickFormatter={(value) => 
-                            new Intl.NumberFormat('en-US', { 
-                              style: 'currency', 
-                              currency: 'USD',
-                              maximumFractionDigits: 0
-                            }).format(value)
-                          }
-                        />
-                        <YAxis type="category" dataKey="name" width={150} />
-                        <Tooltip 
-                          formatter={(value) => [
-                            formatCurrency(value as number),
-                            "Revenue"
-                          ]}
-                        />
-                        <Legend />
-                        <Bar dataKey="revenue" fill="#B0C0A1" name="Revenue" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-muted-foreground">
-                    No location data available for the selected filters
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <LocationPerformanceChart 
+              data={locationPerformanceData}
+              formatCurrency={formatCurrency}
+            />
           </TabsContent>
         </Tabs>
       </main>
