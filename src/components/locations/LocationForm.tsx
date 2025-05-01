@@ -1,6 +1,7 @@
 
 import React, { useState } from "react";
 import { Location } from "@/types";
+import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,7 @@ interface LocationFormProps {
 }
 
 const LocationForm = ({ location, isNew, onClose, onSave, onDelete }: LocationFormProps) => {
+  const { translations } = useLanguage();
   const [currentLocation, setCurrentLocation] = React.useState<Location>(location);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -49,17 +51,17 @@ const LocationForm = ({ location, isNew, onClose, onSave, onDelete }: LocationFo
       <form onSubmit={handleSubmit}>
         <DialogHeader>
           <DialogTitle>
-            {isNew ? "Add New Location" : "Edit Location"}
+            {isNew ? translations.locations.addLocation : translations.locations.editLocation}
           </DialogTitle>
           <DialogDescription>
             {isNew
-              ? "Enter the details for the new point of sale location."
-              : "Update the details for this point of sale location."}
+              ? translations.locations.addLocationDescription
+              : translations.locations.editLocationDescription}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Location Name</Label>
+            <Label htmlFor="name">{translations.locations.locationName}</Label>
             <Input
               id="name"
               name="name"
@@ -70,7 +72,7 @@ const LocationForm = ({ location, isNew, onClose, onSave, onDelete }: LocationFo
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="address">Address</Label>
+            <Label htmlFor="address">{translations.locations.address}</Label>
             <Input
               id="address"
               name="address"
@@ -81,7 +83,7 @@ const LocationForm = ({ location, isNew, onClose, onSave, onDelete }: LocationFo
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="contactName">Contact Person</Label>
+            <Label htmlFor="contactName">{translations.locations.contactPerson}</Label>
             <Input
               id="contactName"
               name="contactName"
@@ -91,7 +93,7 @@ const LocationForm = ({ location, isNew, onClose, onSave, onDelete }: LocationFo
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="contactPhone">Contact Phone</Label>
+            <Label htmlFor="contactPhone">{translations.locations.contactPhone}</Label>
             <Input
               id="contactPhone"
               name="contactPhone"
@@ -101,7 +103,7 @@ const LocationForm = ({ location, isNew, onClose, onSave, onDelete }: LocationFo
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="notes">Notes</Label>
+            <Label htmlFor="notes">{translations.locations.notes}</Label>
             <Textarea
               id="notes"
               name="notes"
@@ -120,16 +122,16 @@ const LocationForm = ({ location, isNew, onClose, onSave, onDelete }: LocationFo
                 variant="destructive"
                 onClick={onDelete}
               >
-                Delete
+                {translations.common.delete}
               </Button>
             )}
           </div>
           <div className="flex space-x-2">
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              {translations.common.cancel}
             </Button>
             <Button type="submit" className="bg-vendora-600 hover:bg-vendora-700">
-              {isNew ? "Add Location" : "Update Location"}
+              {isNew ? translations.locations.addLocation : translations.common.save}
             </Button>
           </div>
         </DialogFooter>

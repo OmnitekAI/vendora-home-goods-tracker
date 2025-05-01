@@ -1,4 +1,5 @@
 
+import { useLanguage } from "@/context/LanguageContext";
 import { Location } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,8 @@ interface LocationCardProps {
 }
 
 const LocationCard = ({ location, onEdit }: LocationCardProps) => {
+  const { translations } = useLanguage();
+  
   return (
     <Card className="overflow-hidden">
       <CardHeader className="pb-2 bg-vendora-50">
@@ -27,20 +30,20 @@ const LocationCard = ({ location, onEdit }: LocationCardProps) => {
       <CardContent className="pt-4">
         <div className="space-y-2">
           <div>
-            <div className="text-sm font-medium text-muted-foreground">Address</div>
+            <div className="text-sm font-medium text-muted-foreground">{translations.locations.address}</div>
             <div>{location.address}</div>
           </div>
           <div>
-            <div className="text-sm font-medium text-muted-foreground">Contact</div>
+            <div className="text-sm font-medium text-muted-foreground">{translations.locations.contactPerson}</div>
             <div>{location.contactName}</div>
           </div>
           <div>
-            <div className="text-sm font-medium text-muted-foreground">Phone</div>
+            <div className="text-sm font-medium text-muted-foreground">{translations.locations.contactPhone}</div>
             <div>{location.contactPhone}</div>
           </div>
           {location.notes && (
             <div>
-              <div className="text-sm font-medium text-muted-foreground">Notes</div>
+              <div className="text-sm font-medium text-muted-foreground">{translations.locations.notes}</div>
               <div className="text-sm">{location.notes}</div>
             </div>
           )}

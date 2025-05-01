@@ -54,10 +54,10 @@ const Locations = () => {
         setIsDialogOpen(true);
       } else {
         navigate("/locations");
-        toast.error("Location not found");
+        toast.error(translations.common.noData);
       }
     }
-  }, [id, locations, navigate]);
+  }, [id, locations, navigate, translations]);
 
   const loadLocations = () => {
     const loadedLocations = getLocations();
@@ -97,10 +97,10 @@ const Locations = () => {
       <Navbar />
       <main className="flex-1 py-8 vendora-container">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-vendora-800">Locations</h1>
+          <h1 className="text-3xl font-bold text-vendora-800">{translations.locations.title}</h1>
           <Button onClick={handleAddNew} className="bg-vendora-600 hover:bg-vendora-700">
             <Plus className="mr-2 h-4 w-4" />
-            Add Location
+            {translations.locations.addLocation}
           </Button>
         </div>
 

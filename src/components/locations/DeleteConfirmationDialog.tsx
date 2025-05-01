@@ -1,4 +1,5 @@
 
+import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -14,12 +15,14 @@ interface DeleteConfirmationDialogProps {
 }
 
 const DeleteConfirmationDialog = ({ onConfirm, onCancel }: DeleteConfirmationDialogProps) => {
+  const { translations } = useLanguage();
+  
   return (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogTitle>{translations.common.confirmDelete}</DialogTitle>
         <DialogDescription>
-          Are you sure you want to delete this location? This action cannot be undone.
+          {translations.common.confirmDelete}
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>
@@ -27,13 +30,13 @@ const DeleteConfirmationDialog = ({ onConfirm, onCancel }: DeleteConfirmationDia
           variant="outline"
           onClick={onCancel}
         >
-          Cancel
+          {translations.common.cancel}
         </Button>
         <Button
           variant="destructive"
           onClick={onConfirm}
         >
-          Delete
+          {translations.common.delete}
         </Button>
       </DialogFooter>
     </DialogContent>
