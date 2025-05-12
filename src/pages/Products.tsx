@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { Product } from "@/types";
-import { getProducts, saveProduct, generateId } from "@/utils/storage"; // Updated import path
+import { getProducts, saveProduct, generateId, getProductCategories } from "@/utils/storage";
 import { ProductDialog } from "@/components/products/ProductDialog";
 import { ProductCategory } from "@/components/products/ProductCategory";
 import { EmptyProducts } from "@/components/products/EmptyProducts";
@@ -60,11 +59,8 @@ const Products = () => {
   }, [id, products, navigate, translations]);
 
   useEffect(() => {
-    // Extract unique categories
-    const uniqueCategories = Array.from(new Set(products.map((p) => p.category)))
-      .filter(category => category)
-      .sort();
-    setCategories(uniqueCategories);
+    // Use the new helper function to get categories
+    setCategories(getProductCategories());
   }, [products]);
 
   const loadProducts = () => {

@@ -2,48 +2,66 @@
 import { Product } from "@/types";
 import { toast } from "@/components/ui/sonner";
 import { loadData, saveData } from "./core";
-import { useLanguage } from "@/context/LanguageContext";
 
+// Get all products from storage
 export const getProducts = (): Product[] => {
   const data = loadData();
   return data.products;
 };
 
+// Get a product by ID
+export const getProductById = (id: string): Product | undefined => {
+  const products = getProducts();
+  return products.find(p => p.id === id);
+};
+
+// Get product name by ID
+export const getProductName = (id: string): string => {
+  const product = getProductById(id);
+  return product ? product.name : "Unknown Product";
+};
+
+// Save or update a product
 export const saveProduct = (product: Product): void => {
   const data = loadData();
   const index = data.products.findIndex(p => p.id === product.id);
+  const isNew = index < 0;
   
-  if (index >= 0) {
-    data.products[index] = product;
-  } else {
+  // Update or add the product
+  if (isNew) {
     data.products.push(product);
+  } else {
+    data.products[index] = product;
   }
   
   saveData(data);
   
-  const message = index >= 0 ? 
-    { en: "Product updated", es: "Producto actualizado" } : 
-    { en: "Product added", es: "Producto añadido" };
+  // Show success message in current language
+  const language = document.documentElement.lang || 'en';
+  const message = isNew 
+    ? (language === 'es' ? "Producto añadido" : "Product added")
+    : (language === 'es' ? "Producto actualizado" : "Product updated");
   
-  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
+  toast.success(message);
 };
 
+// Delete a product
 export const deleteProduct = (id: string): void => {
   const data = loadData();
   data.products = data.products.filter(p => p.id !== id);
   saveData(data);
   
-  const message = { en: "Product deleted", es: "Producto eliminado" };
-  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
+  // Show success message in current language
+  const language = document.documentElement.lang || 'en';
+  const message = language === 'es' ? "Producto eliminado" : "Product deleted";
+  
+  toast.success(message);
 };
 
-export const getProductName = (id: string): string => {
+// Get unique product categories
+export const getProductCategories = (): string[] => {
   const products = getProducts();
-  const product = products.find(p => p.id === id);
-  return product ? product.name : "Unknown Product";
-};
-
-export const getProductById = (id: string): Product | undefined => {
-  const products = getProducts();
-  return products.find(p => p.id === id);
+  return Array.from(new Set(products.map(p => p.category)))
+    .filter(category => category)
+    .sort();
 };
