@@ -144,7 +144,7 @@ export const ProductDialog = ({
                 <Label htmlFor="category">{translations.products.category}</Label>
                 <div className="flex flex-col gap-2">
                   <Select
-                    value={currentProduct.category || ""}
+                    value={showNewCategoryInput ? "new" : (currentProduct.category || "")}
                     onValueChange={handleCategoryChange}
                   >
                     <SelectTrigger id="category">
