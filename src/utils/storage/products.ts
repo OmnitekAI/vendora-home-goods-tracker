@@ -21,6 +21,28 @@ export const getProductName = (id: string): string => {
   return product ? product.name : "Unknown Product";
 };
 
+// Check if a product is used in any orders, deliveries or sales
+export const isProductInUse = (id: string): boolean => {
+  const data = loadData();
+  
+  // Check orders
+  const usedInOrders = data.orders.some(order => 
+    order.items.some(item => item.productId === id)
+  );
+  
+  // Check deliveries
+  const usedInDeliveries = data.deliveries.some(delivery => 
+    delivery.items.some(item => item.productId === id)
+  );
+  
+  // Check sales
+  const usedInSales = data.sales.some(sale => 
+    sale.items.some(item => item.productId === id)
+  );
+  
+  return usedInOrders || usedInDeliveries || usedInSales;
+};
+
 // Save or update a product
 export const saveProduct = (product: Product): void => {
   const data = loadData();
