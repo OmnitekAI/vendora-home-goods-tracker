@@ -17,9 +17,14 @@ export const ProductCategory = ({
   formatCurrency,
   onProductsChange
 }: ProductCategoryProps) => {
+  const bilingualCategory = {
+    en: category,
+    es: category
+  };
+  
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-3">{category}</h2>
+      <h2 className="text-xl font-semibold mb-3">{bilingualCategory.en} / {bilingualCategory.es}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {products.map((product) => (
           <ProductCard
