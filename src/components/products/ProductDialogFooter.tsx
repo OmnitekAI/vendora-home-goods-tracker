@@ -2,7 +2,7 @@
 import { NavigateFunction } from "react-router-dom";
 import { useState } from "react";
 import { Product } from "@/types";
-import { saveProduct } from "@/utils/storage";
+import { saveProduct, deleteProduct } from "@/utils/storage";
 import { toast } from "@/components/ui/sonner";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,14 @@ export const ProductDialogFooter = ({
     navigate("/products");
   };
 
+  const handleDelete = () => {
+    deleteProduct(currentProduct.id);
+    setIsDeleteDialogOpen(false);
+    onClose();
+    onSave(); // Refresh the product list
+    navigate("/products");
+  };
+
   return (
     <>
       <DialogFooter className="flex items-center justify-between">
@@ -73,11 +81,7 @@ export const ProductDialogFooter = ({
         <ProductDeleteDialog
           isOpen={isDeleteDialogOpen}
           onClose={() => setIsDeleteDialogOpen(false)}
-          onDelete={() => {
-            setIsDeleteDialogOpen(false);
-            onClose();
-            navigate("/products");
-          }}
+          onDelete={handleDelete}
           productId={currentProduct.id}
           productName={currentProduct.name}
         />

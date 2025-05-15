@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -59,7 +60,6 @@ const Products = () => {
   }, [id, products, navigate, translations]);
 
   useEffect(() => {
-    // Use the new helper function to get categories
     setCategories(getProductCategories());
   }, [products]);
 
@@ -121,6 +121,7 @@ const Products = () => {
                 products={categoryProducts}
                 onEdit={handleEdit}
                 formatCurrency={formatCurrency}
+                onProductsChange={loadProducts}
               />
             ))}
           </div>
