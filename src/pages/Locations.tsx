@@ -137,8 +137,6 @@ const Locations = () => {
           <DeleteConfirmationDialog
             onCancel={() => setIsDeleteDialogOpen(false)}
             onConfirm={handleDeleteLocation}
-            open={isDeleteDialogOpen}
-            onOpenChange={setIsDeleteDialogOpen}
           />
         </Dialog>
       </main>

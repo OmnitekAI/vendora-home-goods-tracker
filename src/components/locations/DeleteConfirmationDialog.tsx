@@ -15,14 +15,16 @@ interface DeleteConfirmationDialogProps {
 }
 
 const DeleteConfirmationDialog = ({ onConfirm, onCancel }: DeleteConfirmationDialogProps) => {
-  const { translations } = useLanguage();
+  const { translations, language } = useLanguage();
   
   return (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
         <DialogTitle>{translations.common.confirmDelete}</DialogTitle>
         <DialogDescription>
-          {translations.common.confirmDelete}
+          {language === 'es' 
+            ? '¿Estás seguro de que quieres eliminar este elemento? Esta acción no se puede deshacer.'
+            : 'Are you sure you want to delete this item? This action cannot be undone.'}
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>

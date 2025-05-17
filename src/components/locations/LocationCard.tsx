@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Edit, MoreVertical, Trash2 } from "lucide-react";
 import { deleteLocation } from "@/utils/storage";
+import { Dialog } from "@/components/ui/dialog";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import {
   DropdownMenu,
@@ -89,12 +90,12 @@ const LocationCard = ({ location, onEdit, onDelete }: LocationCardProps) => {
         </CardContent>
       </Card>
 
-      <DeleteConfirmationDialog
-        onCancel={() => setIsDeleteDialogOpen(false)}
-        onConfirm={handleDelete}
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-      />
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DeleteConfirmationDialog 
+          onCancel={() => setIsDeleteDialogOpen(false)}
+          onConfirm={handleDelete}
+        />
+      </Dialog>
     </>
   );
 };
