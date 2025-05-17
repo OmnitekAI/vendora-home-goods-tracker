@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Upload, Download, Menu } from "lucide-react";
+import { Upload, Download, Menu, ExternalLink } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { exportData, importData } from "@/utils/storage";
 import { useLanguage } from "@/context/LanguageContext";
@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 export const DataActions = () => {
@@ -81,6 +82,16 @@ export const DataActions = () => {
         <DropdownMenuItem onClick={handleImport} className="flex items-center gap-2">
           <Upload className="h-4 w-4" />
           {translations.common.import}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem 
+          asChild
+          className="flex items-center gap-2"
+        >
+          <a href="https://delacasa.app/" target="_blank" rel="noopener noreferrer">
+            <ExternalLink className="h-4 w-4" />
+            {language === 'es' ? 'DeLaCasa' : 'DeLaCasa'}
+          </a>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
