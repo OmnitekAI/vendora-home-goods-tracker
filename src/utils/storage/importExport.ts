@@ -2,6 +2,7 @@
 import { DataStore } from "@/types";
 import { toast } from "@/components/ui/sonner";
 import { loadData, saveData } from "./core";
+import { useLanguage } from "@/context/LanguageContext";
 
 // Export/Import functions
 export const exportData = (): string => {
@@ -21,11 +22,19 @@ export const importData = (jsonString: string): boolean => {
     }
     
     saveData(data);
-    toast.success("Data imported successfully");
+    
+    // Get language for toast messages
+    const language = localStorage.getItem('language') || 'en';
+    
+    toast.success(language === 'es' ? "Datos importados exitosamente" : "Data imported successfully");
     return true;
   } catch (error) {
     console.error("Failed to import data:", error);
-    toast.error("Failed to import data: Invalid format");
+    
+    // Get language for toast messages
+    const language = localStorage.getItem('language') || 'en';
+    
+    toast.error(language === 'es' ? "Error al importar datos: formato inválido" : "Failed to import data: Invalid format");
     return false;
   }
 };

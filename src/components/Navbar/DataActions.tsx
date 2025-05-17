@@ -26,10 +26,10 @@ export const DataActions = () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      toast.success("Data exported successfully");
+      toast.success(language === 'es' ? "Datos exportados exitosamente" : "Data exported successfully");
     } catch (error) {
       console.error("Export failed:", error);
-      toast.error("Failed to export data");
+      toast.error(language === 'es' ? "Error al exportar datos" : "Failed to export data");
     }
   };
 
