@@ -26,13 +26,11 @@ export const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         <NavbarItems onMobileItemClick={onClose} />
         <div className="flex space-x-2 pt-2">
           <DataActions />
-        </div>
-        <div className="pt-2">
           <Button
             variant="outline"
             size="sm"
             onClick={toggleLanguage}
-            className="flex items-center gap-1 w-full justify-center"
+            className="flex items-center gap-1 flex-1"
           >
             <Globe className="h-4 w-4" />
             {language === 'en' ? 'Español' : 'English'}

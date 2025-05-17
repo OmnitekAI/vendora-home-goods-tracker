@@ -1,12 +1,18 @@
 
 import { Button } from "@/components/ui/button";
-import { Upload, Download } from "lucide-react";
+import { Upload, Download, MoreVertical } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { exportData, importData } from "@/utils/storage";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const DataActions = () => {
-  const { translations } = useLanguage();
+  const { translations, language } = useLanguage();
 
   const handleExport = () => {
     try {
@@ -54,25 +60,27 @@ export const DataActions = () => {
   };
 
   return (
-    <>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleExport}
-        className="flex items-center gap-1"
-      >
-        <Download className="h-4 w-4" />
-        {translations.common.export}
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleImport}
-        className="flex items-center gap-1"
-      >
-        <Upload className="h-4 w-4" />
-        {translations.common.import}
-      </Button>
-    </>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-1"
+        >
+          <MoreVertical className="h-4 w-4" />
+          {language === 'es' ? 'Opciones' : 'Options'}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem onClick={handleExport} className="flex items-center gap-2">
+          <Download className="h-4 w-4" />
+          {translations.common.export}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleImport} className="flex items-center gap-2">
+          <Upload className="h-4 w-4" />
+          {translations.common.import}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
