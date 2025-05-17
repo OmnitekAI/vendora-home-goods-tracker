@@ -2,7 +2,6 @@
 import { DataStore } from "@/types";
 import { toast } from "@/components/ui/sonner";
 import { loadData, saveData } from "./core";
-import { useLanguage } from "@/context/LanguageContext";
 
 // Export/Import functions
 export const exportData = (): string => {

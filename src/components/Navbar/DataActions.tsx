@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Upload, Download, MoreVertical } from "lucide-react";
+import { Upload, Download, Menu } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { exportData, importData } from "@/utils/storage";
 import { useLanguage } from "@/context/LanguageContext";
@@ -65,10 +65,12 @@ export const DataActions = () => {
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-1"
+          className="flex items-center"
         >
-          <MoreVertical className="h-4 w-4" />
-          {language === 'es' ? 'Opciones' : 'Options'}
+          <Menu className="h-4 w-4" />
+          <span className="sr-only">
+            {language === 'es' ? 'Menú' : 'Menu'}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
