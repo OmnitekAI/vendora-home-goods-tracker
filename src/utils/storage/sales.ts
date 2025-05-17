@@ -19,12 +19,19 @@ export const saveSale = (sale: Sale): void => {
   }
   
   saveData(data);
-  toast.success(`Sale ${index >= 0 ? 'updated' : 'added'}`);
+  
+  const message = index >= 0 ? 
+    { en: "Sale updated", es: "Venta actualizada" } : 
+    { en: "Sale added", es: "Venta añadida" };
+  
+  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
 };
 
 export const deleteSale = (id: string): void => {
   const data = loadData();
   data.sales = data.sales.filter(s => s.id !== id);
   saveData(data);
-  toast.success("Sale deleted");
+  
+  const message = { en: "Sale deleted", es: "Venta eliminada" };
+  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
 };

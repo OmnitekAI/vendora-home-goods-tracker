@@ -19,12 +19,19 @@ export const saveOrder = (order: Order): void => {
   }
   
   saveData(data);
-  toast.success(`Order ${index >= 0 ? 'updated' : 'added'}`);
+  
+  const message = index >= 0 ? 
+    { en: "Order updated", es: "Orden actualizada" } : 
+    { en: "Order added", es: "Orden añadida" };
+  
+  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
 };
 
 export const deleteOrder = (id: string): void => {
   const data = loadData();
   data.orders = data.orders.filter(o => o.id !== id);
   saveData(data);
-  toast.success("Order deleted");
+  
+  const message = { en: "Order deleted", es: "Orden eliminada" };
+  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
 };

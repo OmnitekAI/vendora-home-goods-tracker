@@ -19,14 +19,21 @@ export const saveLocation = (location: Location): void => {
   }
   
   saveData(data);
-  toast.success(`Location ${index >= 0 ? 'updated' : 'added'}`);
+  
+  const message = index >= 0 ? 
+    { en: "Location updated", es: "Ubicación actualizada" } : 
+    { en: "Location added", es: "Ubicación añadida" };
+  
+  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
 };
 
 export const deleteLocation = (id: string): void => {
   const data = loadData();
   data.locations = data.locations.filter(l => l.id !== id);
   saveData(data);
-  toast.success("Location deleted");
+  
+  const message = { en: "Location deleted", es: "Ubicación eliminada" };
+  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
 };
 
 export const getLocationName = (id: string): string => {

@@ -13,7 +13,7 @@ import {
   generateId,
   getLocations,
   getProducts,
-} from "@/utils/storage"; // Updated import path
+} from "@/utils/storage";
 import { EmptyDeliveries } from "@/components/deliveries/EmptyDeliveries";
 import { DeliveryCard } from "@/components/deliveries/DeliveryCard";
 import { DeliveryDialog } from "@/components/deliveries/DeliveryDialog";
@@ -146,6 +146,7 @@ const Deliveries = () => {
                 onEdit={handleEdit}
                 formatCurrency={formatCurrency}
                 formatDate={formatDate}
+                onDelete={loadDeliveries}
               />
             ))}
           </div>

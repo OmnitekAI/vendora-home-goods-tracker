@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { Location } from "@/types";
-import { getLocations, saveLocation, deleteLocation, generateId } from "@/utils/dataStorage";
+import { getLocations, saveLocation, deleteLocation, generateId } from "@/utils/storage";
 
 import LocationCard from "@/components/locations/LocationCard";
 import LocationForm from "@/components/locations/LocationForm";
@@ -112,7 +112,8 @@ const Locations = () => {
               <LocationCard 
                 key={location.id} 
                 location={location} 
-                onEdit={handleEditLocation} 
+                onEdit={handleEditLocation}
+                onDelete={loadLocations}
               />
             ))}
           </div>
@@ -136,6 +137,8 @@ const Locations = () => {
           <DeleteConfirmationDialog
             onCancel={() => setIsDeleteDialogOpen(false)}
             onConfirm={handleDeleteLocation}
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
           />
         </Dialog>
       </main>
