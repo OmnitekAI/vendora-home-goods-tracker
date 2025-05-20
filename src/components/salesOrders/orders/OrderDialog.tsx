@@ -169,7 +169,7 @@ const OrderDialog = ({
                 {c.cancel}
               </Button>
               <Button type="submit" className="bg-vendora-600 hover:bg-vendora-700">
-                {isNew ? c.create : c.save}
+                {isNew ? c.add : c.save}
               </Button>
             </div>
           </DialogFooter>

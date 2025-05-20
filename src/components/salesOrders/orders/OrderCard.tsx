@@ -69,7 +69,7 @@ const OrderCard = ({ order, onEdit, onDelete }: OrderCardProps) => {
           {t.date}: {formatDate(order.date)}
         </div>
         <div className="text-sm mb-2">
-          {t.items}: {order.items.length}
+          {t.quantity}: {order.items.length}
         </div>
         {order.notes && (
           <div className="text-sm italic text-muted-foreground mt-2">
