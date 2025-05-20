@@ -20,7 +20,7 @@ export const saveOrder = (order: Order): void => {
   
   saveData(data);
   
-  const language = localStorage.getItem('language') || 'en';
+  const language = localStorage.getItem('vendora-language') || 'en';
   const message = index >= 0 ? 
     { en: "Order updated", es: "Orden actualizada" } : 
     { en: "Order added", es: "Orden añadida" };
@@ -33,7 +33,7 @@ export const deleteOrder = (id: string): void => {
   data.orders = data.orders.filter(o => o.id !== id);
   saveData(data);
   
-  const language = localStorage.getItem('language') || 'en';
+  const language = localStorage.getItem('vendora-language') || 'en';
   const message = { en: "Order deleted", es: "Orden eliminada" };
   toast.success(language === 'es' ? message.es : message.en);
 };

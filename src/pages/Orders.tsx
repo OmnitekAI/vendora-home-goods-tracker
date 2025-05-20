@@ -49,7 +49,7 @@ const Orders = () => {
   useEffect(() => {
     console.log("Orders - URL params updated:", params);
     
-    const id = params.id;
+    const id = params.id || params.action;
     const action = params.action;
     
     if (action === "new-order") {
