@@ -9,7 +9,8 @@ import Index from "./pages/Index";
 import Locations from "./pages/Locations";
 import Products from "./pages/Products";
 import Deliveries from "./pages/Deliveries";
-import SalesOrders from "./pages/SalesOrders";
+import SalesPage from "./pages/Sales";
+import OrdersPage from "./pages/Orders";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -30,13 +31,13 @@ const App = () => (
             <Route path="/products/:id" element={<Products />} />
             <Route path="/deliveries" element={<Deliveries />} />
             <Route path="/deliveries/:id" element={<Deliveries />} />
-            <Route path="/sales-orders" element={<SalesOrders />} />
-            <Route path="/sales" element={<SalesOrders />} />
-            <Route path="/orders" element={<SalesOrders />} />
-            <Route path="/sales/:action" element={<SalesOrders />} />
-            <Route path="/orders/:action" element={<SalesOrders />} />
-            <Route path="/sales/sales/:id" element={<SalesOrders />} />
-            <Route path="/orders/orders/:id" element={<SalesOrders />} />
+            {/* Updated routes for separate Sales and Orders pages */}
+            <Route path="/sales" element={<SalesPage />} />
+            <Route path="/sales/:action" element={<SalesPage />} />
+            <Route path="/sales/sales/:id" element={<SalesPage />} />
+            <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/orders/:action" element={<OrdersPage />} />
+            <Route path="/orders/orders/:id" element={<OrdersPage />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
