@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Sale, SaleItem, Location, Product } from "@/types";
 import { Plus, X } from "lucide-react";
@@ -70,7 +69,8 @@ const SaleDialog = ({
     setNewSaleItem({
       productId,
       quantity: 1,
-      pricePerUnit: product ? product.suggestedRetailPrice : 0,
+      // Changed from suggestedRetailPrice to wholesalePrice
+      pricePerUnit: product ? product.wholesalePrice : 0,
     });
   };
 
