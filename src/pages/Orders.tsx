@@ -35,14 +35,7 @@ const Orders = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   // Current item states
-  const [currentOrder, setCurrentOrder] = useState<Order>({
-    id: "",
-    locationId: "",
-    date: new Date().toISOString().split("T")[0],
-    items: [],
-    status: "pending",
-    notes: "",
-  });
+  const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     loadOrders();
@@ -99,11 +92,13 @@ const Orders = () => {
   };
 
   const handleDeleteOrder = () => {
-    deleteOrder(currentOrder.id);
-    loadOrders();
-    setIsDeleteDialogOpen(false);
-    setIsOrderDialogOpen(false);
-    navigate("/orders");
+    if (currentOrder) {
+      deleteOrder(currentOrder.id);
+      loadOrders();
+      setIsDeleteDialogOpen(false);
+      setIsOrderDialogOpen(false);
+      navigate("/orders");
+    }
   };
 
   const handleAddNewOrder = () => {
@@ -140,16 +135,18 @@ const Orders = () => {
         />
 
         {/* Order Dialog */}
-        <OrderDialog
-          open={isOrderDialogOpen}
-          onOpenChange={handleCloseDialog}
-          order={currentOrder}
-          locations={locations}
-          products={products}
-          onSubmit={handleSubmitOrder}
-          onDelete={() => setIsDeleteDialogOpen(true)}
-          isNew={!currentOrder.id || params.action === "new-order"}
-        />
+        {currentOrder && (
+          <OrderDialog
+            open={isOrderDialogOpen}
+            onOpenChange={handleCloseDialog}
+            order={currentOrder}
+            locations={locations}
+            products={products}
+            onSubmit={handleSubmitOrder}
+            onDelete={() => setIsDeleteDialogOpen(true)}
+            isNew={!currentOrder.id || params.action === "new-order"}
+          />
+        )}
 
         {/* Delete Confirmation Dialog */}
         <DeleteConfirmationDialog

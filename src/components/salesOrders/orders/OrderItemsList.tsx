@@ -11,7 +11,7 @@ interface OrderItemsListProps {
 }
 
 const OrderItemsList = ({ items, onRemove }: OrderItemsListProps) => {
-  const { translations } = useLanguage();
+  const { translations, language } = useLanguage();
   const t = translations.salesOrders;
 
   if (items.length === 0) {
@@ -37,6 +37,7 @@ const OrderItemsList = ({ items, onRemove }: OrderItemsListProps) => {
             size="icon"
             variant="ghost"
             onClick={() => onRemove(index)}
+            aria-label={language === 'es' ? 'Eliminar' : 'Remove'}
           >
             <X className="h-4 w-4" />
           </Button>

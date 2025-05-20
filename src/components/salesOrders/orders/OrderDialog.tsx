@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Order, OrderItem, Location, Product } from "@/types";
 import {
   Dialog,
@@ -48,10 +48,10 @@ const OrderDialog = ({
     quantity: 1,
   });
 
-  // Reset the form when the dialog opens with new data
-  useState(() => {
+  // Update the current order when the prop changes
+  useEffect(() => {
     setCurrentOrder(order);
-  });
+  }, [order]);
 
   const handleOrderChange = (updatedOrder: Order) => {
     setCurrentOrder(updatedOrder);
