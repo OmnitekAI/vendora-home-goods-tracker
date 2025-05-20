@@ -24,7 +24,7 @@ const OrderCard = ({ order, onEdit, onDelete }: OrderCardProps) => {
   const c = translations.common;
 
   const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat("en-US", {
+    return new Intl.DateTimeFormat(language === 'es' ? "es-ES" : "en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",

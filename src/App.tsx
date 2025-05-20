@@ -31,13 +31,13 @@ const App = () => (
             <Route path="/products/:id" element={<Products />} />
             <Route path="/deliveries" element={<Deliveries />} />
             <Route path="/deliveries/:id" element={<Deliveries />} />
-            {/* Updated routes for separate Sales and Orders pages */}
+            {/* Fixed routes for Sales and Orders pages */}
             <Route path="/sales" element={<SalesPage />} />
-            <Route path="/sales/:action" element={<SalesPage />} />
-            <Route path="/sales/sales/:id" element={<SalesPage />} />
+            <Route path="/sales/new-sale" element={<SalesPage />} />
+            <Route path="/sales/:id" element={<SalesPage />} />
             <Route path="/orders" element={<OrdersPage />} />
-            <Route path="/orders/:action" element={<OrdersPage />} />
-            <Route path="/orders/orders/:id" element={<OrdersPage />} />
+            <Route path="/orders/new-order" element={<OrdersPage />} />
+            <Route path="/orders/:id" element={<OrdersPage />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

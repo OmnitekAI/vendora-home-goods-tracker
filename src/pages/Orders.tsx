@@ -111,7 +111,7 @@ const Orders = () => {
   };
 
   const handleEditOrder = (order: Order) => {
-    navigate(`/orders/orders/${order.id}`);
+    navigate(`/orders/${order.id}`);
   };
 
   const handleDeleteOrderFromList = (order: Order) => {
