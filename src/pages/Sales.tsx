@@ -140,7 +140,7 @@ const Sales = () => {
         {/* Sale Dialog */}
         <SaleDialog
           open={isSaleDialogOpen}
-          onOpenChange={setIsSaleDialogOpen}
+          onOpenChange={handleCloseDialog}
           sale={currentSale}
           locations={locations}
           products={products}

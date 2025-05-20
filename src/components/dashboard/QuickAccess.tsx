@@ -42,7 +42,7 @@ const QuickAccess = () => {
           </Link>
         </div>
         <div>
-          <Link to="/sales-orders/new-sale">
+          <Link to="/sales/new-sale">
             <Button variant="secondary" className="w-full justify-start">
               <ShoppingCart className="mr-2 h-4 w-4" />
               {translations.dashboard.recordSale}

@@ -142,7 +142,7 @@ const Orders = () => {
         {/* Order Dialog */}
         <OrderDialog
           open={isOrderDialogOpen}
-          onOpenChange={setIsOrderDialogOpen}
+          onOpenChange={handleCloseDialog}
           order={currentOrder}
           locations={locations}
           products={products}

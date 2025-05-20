@@ -33,10 +33,10 @@ const App = () => (
             <Route path="/deliveries/:id" element={<Deliveries />} />
             {/* Fixed routes for Sales and Orders pages */}
             <Route path="/sales" element={<SalesPage />} />
-            <Route path="/sales/new-sale" element={<SalesPage />} />
-            <Route path="/sales/:id" element={<SalesPage />} />
+            <Route path="/sales/:action" element={<SalesPage />} />
+            <Route path="/sales/sales/:id" element={<SalesPage />} />
             <Route path="/orders" element={<OrdersPage />} />
-            <Route path="/orders/new-order" element={<OrdersPage />} />
+            <Route path="/orders/:action" element={<OrdersPage />} />
             <Route path="/orders/:id" element={<OrdersPage />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="*" element={<NotFound />} />
