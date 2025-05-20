@@ -44,6 +44,9 @@ const Orders = () => {
   }, []);
 
   useEffect(() => {
+    // Debug log to ensure this effect is running
+    console.log("Route params:", params);
+    
     const id = params.id;
     const action = params.action;
     
@@ -58,13 +61,22 @@ const Orders = () => {
       });
       setIsOrderDialogOpen(true);
     } else if (id) {
+      // Debug log for the ID parameter
+      console.log("Order ID from URL:", id);
+      console.log("Available orders:", orders);
+      
       const order = orders.find((o) => o.id === id);
+      console.log("Found order:", order);
+      
       if (order) {
         setCurrentOrder(order);
         setIsOrderDialogOpen(true);
       } else {
-        navigate("/orders");
-        toast.error(language === 'es' ? "Orden no encontrada" : "Order not found");
+        // Only navigate away if we've already loaded orders
+        if (orders.length > 0) {
+          navigate("/orders");
+          toast.error(language === 'es' ? "Orden no encontrada" : "Order not found");
+        }
       }
     }
   }, [params, orders, locations, navigate, language]);
@@ -72,6 +84,16 @@ const Orders = () => {
   const loadOrders = () => {
     const loadedOrders = getOrders();
     setOrders(loadedOrders);
+    
+    // After loading orders, check if we need to show an order based on URL
+    const id = params.id;
+    if (id) {
+      const order = loadedOrders.find((o) => o.id === id);
+      if (order) {
+        setCurrentOrder(order);
+        setIsOrderDialogOpen(true);
+      }
+    }
   };
 
   const loadLocations = () => {
@@ -144,7 +166,7 @@ const Orders = () => {
             products={products}
             onSubmit={handleSubmitOrder}
             onDelete={() => setIsDeleteDialogOpen(true)}
-            isNew={!currentOrder.id || params.action === "new-order"}
+            isNew={params.action === "new-order"}
           />
         )}
 

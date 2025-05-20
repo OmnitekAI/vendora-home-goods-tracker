@@ -50,8 +50,14 @@ const OrderDialog = ({
 
   // Update the current order when the prop changes
   useEffect(() => {
+    console.log("OrderDialog - received order:", order);
     setCurrentOrder(order);
   }, [order]);
+
+  // Additional effect to ensure dialog is properly opened
+  useEffect(() => {
+    console.log("OrderDialog - open state changed:", open);
+  }, [open]);
 
   const handleOrderChange = (updatedOrder: Order) => {
     setCurrentOrder(updatedOrder);
@@ -163,7 +169,7 @@ const OrderDialog = ({
                 {c.cancel}
               </Button>
               <Button type="submit" className="bg-vendora-600 hover:bg-vendora-700">
-                {isNew ? t.newOrder : c.save}
+                {isNew ? c.create : c.save}
               </Button>
             </div>
           </DialogFooter>

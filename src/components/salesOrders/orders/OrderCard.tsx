@@ -1,16 +1,10 @@
 
 import { Order } from "@/types";
-import { Store, Calendar, MoreVertical, Edit, Trash2 } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Edit, Trash } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { getLocationName, getProductName } from "@/utils/dataStorage";
+import { getLocationName } from "@/utils/dataStorage";
 
 interface OrderCardProps {
   order: Order;
@@ -19,108 +13,91 @@ interface OrderCardProps {
 }
 
 const OrderCard = ({ order, onEdit, onDelete }: OrderCardProps) => {
-  const { translations, language } = useLanguage();
+  const { translations } = useLanguage();
   const t = translations.salesOrders;
   const c = translations.common;
 
-  const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat(language === 'es' ? "es-ES" : "en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }).format(new Date(dateString));
+  // Helper to format date in a readable way
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString();
   };
 
-  const getOrderStatusColor = (status: string) => {
+  // Helper to get status class
+  const getStatusClass = (status: string) => {
     switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
       case "delivered":
-        return "text-green-600";
+        return "bg-green-100 text-green-800";
       case "cancelled":
-        return "text-red-600";
+        return "bg-red-100 text-red-800";
       default:
-        return "text-amber-600";
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  const getOrderStatusBg = (status: string) => {
+  // Helper to translate status
+  const translateStatus = (status: string) => {
     switch (status) {
+      case "pending":
+        return t.pending;
       case "delivered":
-        return "bg-green-600";
+        return t.delivered;
       case "cancelled":
-        return "bg-red-600";
+        return t.cancelled;
       default:
-        return "bg-amber-600";
+        return status;
     }
+  };
+
+  const handleEdit = () => {
+    console.log("Editing order:", order);
+    onEdit(order);
   };
 
   return (
-    <Card className={`border-${order.status === 'delivered' ? 'sage' : 'vendora'}-200`}>
-      <CardHeader className={`pb-2 bg-${order.status === 'delivered' ? 'sage' : 'vendora'}-50`}>
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Store className="h-4 w-4 text-vendora-600" />
-            <CardTitle className="truncate text-base">{getLocationName(order.locationId)}</CardTitle>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8"
-              >
-                <MoreVertical className="h-4 w-4" />
-                <span className="sr-only">
-                  {language === 'es' ? 'Menú de acciones' : 'Actions menu'}
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onClick={() => onEdit(order)}>
-                <Edit className="h-4 w-4 mr-2" />
-                {c.edit}
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => onDelete(order)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                {c.delete}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+    <Card className="overflow-hidden">
+      <CardContent className="p-6">
+        <div className="flex justify-between mb-2">
+          <h3 className="font-medium">{getLocationName(order.locationId)}</h3>
+          <span className={`px-2 py-0.5 rounded-full text-xs ${getStatusClass(order.status)}`}>
+            {translateStatus(order.status)}
+          </span>
         </div>
-        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-          <Calendar className="h-3 w-3" />
-          <span>{formatDate(order.date)}</span>
+        <div className="text-sm text-muted-foreground mb-2">
+          {t.date}: {formatDate(order.date)}
         </div>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <div className="space-y-1">
-          {order.items.map((item, idx) => (
-            <div key={idx} className="flex justify-between text-sm">
-              <div>{item.quantity}x {getProductName(item.productId)}</div>
-            </div>
-          ))}
+        <div className="text-sm mb-2">
+          {t.items}: {order.items.length}
         </div>
-        <div className="mt-4 pt-2 border-t border-border">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">{t.status}:</span>
-            <span className={`text-sm ${getOrderStatusColor(order.status)} font-medium flex items-center gap-1`}>
-              <span className={`h-2 w-2 ${getOrderStatusBg(order.status)} rounded-full`}></span>
-              {order.status === 'pending' ? t.pending : 
-               order.status === 'delivered' ? t.delivered : 
-               t.cancelled}
-            </span>
-          </div>
-        </div>
-      </CardContent>
-      {order.notes && (
-        <CardFooter className="pt-0">
-          <div className="text-xs text-muted-foreground truncate w-full">
+        {order.notes && (
+          <div className="text-sm italic text-muted-foreground mt-2">
             {order.notes}
           </div>
-        </CardFooter>
-      )}
+        )}
+      </CardContent>
+      <CardFooter className="bg-muted/50 p-4 flex justify-end gap-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleEdit}
+          aria-label={c.edit}
+        >
+          <Edit className="h-4 w-4 mr-1" />
+          {c.edit}
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="text-destructive hover:text-destructive" 
+          onClick={() => onDelete(order)}
+          aria-label={c.delete}
+        >
+          <Trash className="h-4 w-4 mr-1" />
+          {c.delete}
+        </Button>
+      </CardFooter>
     </Card>
   );
 };
