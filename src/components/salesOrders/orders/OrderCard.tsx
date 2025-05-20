@@ -2,9 +2,15 @@
 import { Order } from "@/types";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash } from "lucide-react";
+import { Edit, Trash, MoreVertical } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { getLocationName } from "@/utils/dataStorage";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface OrderCardProps {
   order: Order;
@@ -13,7 +19,7 @@ interface OrderCardProps {
 }
 
 const OrderCard = ({ order, onEdit, onDelete }: OrderCardProps) => {
-  const { translations } = useLanguage();
+  const { translations, language } = useLanguage();
   const t = translations.salesOrders;
   const c = translations.common;
 
@@ -61,9 +67,34 @@ const OrderCard = ({ order, onEdit, onDelete }: OrderCardProps) => {
       <CardContent className="p-6">
         <div className="flex justify-between mb-2">
           <h3 className="font-medium">{getLocationName(order.locationId)}</h3>
-          <span className={`px-2 py-0.5 rounded-full text-xs ${getStatusClass(order.status)}`}>
-            {translateStatus(order.status)}
-          </span>
+          <div className="flex items-center">
+            <span className={`px-2 py-0.5 rounded-full text-xs mr-2 ${getStatusClass(order.status)}`}>
+              {translateStatus(order.status)}
+            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="ghost" className="h-8 w-8">
+                  <MoreVertical className="h-4 w-4" />
+                  <span className="sr-only">
+                    {language === 'es' ? 'Menú de acciones' : 'Actions menu'}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem onClick={handleEdit}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  {c.edit}
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => onDelete(order)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash className="h-4 w-4 mr-2" />
+                  {c.delete}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
         <div className="text-sm text-muted-foreground mb-2">
           {t.date}: {formatDate(order.date)}
@@ -77,27 +108,6 @@ const OrderCard = ({ order, onEdit, onDelete }: OrderCardProps) => {
           </div>
         )}
       </CardContent>
-      <CardFooter className="bg-muted/50 p-4 flex justify-end gap-2">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleEdit}
-          aria-label={c.edit}
-        >
-          <Edit className="h-4 w-4 mr-1" />
-          {c.edit}
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="text-destructive hover:text-destructive" 
-          onClick={() => onDelete(order)}
-          aria-label={c.delete}
-        >
-          <Trash className="h-4 w-4 mr-1" />
-          {c.delete}
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

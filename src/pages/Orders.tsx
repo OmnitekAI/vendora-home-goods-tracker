@@ -37,20 +37,23 @@ const Orders = () => {
   // Current item states
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
 
+  // Load data on component mount
   useEffect(() => {
+    console.log("Orders - Initial load");
     loadOrders();
     loadLocations();
     loadProducts();
   }, []);
 
+  // Handle URL parameters
   useEffect(() => {
-    // Debug log to ensure this effect is running
-    console.log("Route params:", params);
+    console.log("Orders - URL params updated:", params);
     
     const id = params.id;
     const action = params.action;
     
     if (action === "new-order") {
+      console.log("Creating new order");
       setCurrentOrder({
         id: generateId(),
         locationId: locations.length > 0 ? locations[0].id : "",
@@ -61,10 +64,7 @@ const Orders = () => {
       });
       setIsOrderDialogOpen(true);
     } else if (id) {
-      // Debug log for the ID parameter
-      console.log("Order ID from URL:", id);
-      console.log("Available orders:", orders);
-      
+      console.log("Looking for order with ID:", id);
       const order = orders.find((o) => o.id === id);
       console.log("Found order:", order);
       
@@ -74,6 +74,7 @@ const Orders = () => {
       } else {
         // Only navigate away if we've already loaded orders
         if (orders.length > 0) {
+          console.log("Order not found, navigating back to orders list");
           navigate("/orders");
           toast.error(language === 'es' ? "Orden no encontrada" : "Order not found");
         }
@@ -83,17 +84,8 @@ const Orders = () => {
 
   const loadOrders = () => {
     const loadedOrders = getOrders();
+    console.log("Orders loaded:", loadedOrders);
     setOrders(loadedOrders);
-    
-    // After loading orders, check if we need to show an order based on URL
-    const id = params.id;
-    if (id) {
-      const order = loadedOrders.find((o) => o.id === id);
-      if (order) {
-        setCurrentOrder(order);
-        setIsOrderDialogOpen(true);
-      }
-    }
   };
 
   const loadLocations = () => {
@@ -107,6 +99,7 @@ const Orders = () => {
   };
 
   const handleSubmitOrder = (order: Order) => {
+    console.log("Submitting order:", order);
     saveOrder(order);
     loadOrders();
     setIsOrderDialogOpen(false);
@@ -124,14 +117,17 @@ const Orders = () => {
   };
 
   const handleAddNewOrder = () => {
+    console.log("Adding new order");
     navigate("/orders/new-order");
   };
 
   const handleEditOrder = (order: Order) => {
+    console.log("Navigating to edit order:", order.id);
     navigate(`/orders/${order.id}`);
   };
 
   const handleDeleteOrderFromList = (order: Order) => {
+    console.log("Opening delete confirmation for order:", order.id);
     setCurrentOrder(order);
     setIsDeleteDialogOpen(true);
   };

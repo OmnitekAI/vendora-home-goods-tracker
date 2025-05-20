@@ -16,6 +16,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import OrderDetailsForm from "./OrderDetailsForm";
 import OrderItemForm from "./OrderItemForm";
 import OrderItemsList from "./OrderItemsList";
+import { toast } from "@/components/ui/sonner";
 
 interface OrderDialogProps {
   open: boolean;
@@ -68,6 +69,11 @@ const OrderDialog = ({
   };
 
   const handleAddOrderItem = () => {
+    if (!newOrderItem.productId) {
+      toast.error(language === 'es' ? "Por favor seleccione un producto" : "Please select a product");
+      return;
+    }
+    
     // Check if item already exists
     const existingItemIndex = currentOrder.items.findIndex(
       item => item.productId === newOrderItem.productId
@@ -109,6 +115,18 @@ const OrderDialog = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!currentOrder.locationId) {
+      toast.error(language === 'es' ? "La ubicación es obligatoria" : "Location is required");
+      return;
+    }
+    
+    if (currentOrder.items.length === 0) {
+      toast.error(language === 'es' ? "Se requiere al menos un producto" : "At least one product is required");
+      return;
+    }
+    
+    console.log("Submitting order:", currentOrder);
     onSubmit(currentOrder);
   };
 
