@@ -1,42 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  ShoppingCart,
-  Plus,
-  Edit,
-  X,
-  Store,
-  Calendar,
-  ArrowRight,
-  Check,
-  MoreVertical,
-  Trash2,
-} from "lucide-react";
+import { Sale, Order, Location, Product } from "@/types";
 import { toast } from "@/components/ui/sonner";
-import { Sale, SaleItem, Order, OrderItem, Location, Product } from "@/types";
 import {
   getSales,
   saveSale,
@@ -47,17 +15,15 @@ import {
   generateId,
   getLocations,
   getProducts,
-  getLocationName,
-  getProductName,
-  getProductById,
 } from "@/utils/dataStorage";
 import { useLanguage } from "@/context/LanguageContext";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  SalesList,
+  OrdersList,
+  SaleDialog,
+  OrderDialog,
+  DeleteConfirmationDialog
+} from "@/components/salesOrders";
 
 const SalesOrders = () => {
   const params = useParams();
@@ -66,18 +32,20 @@ const SalesOrders = () => {
   const [activeTab, setActiveTab] = useState("sales");
   const { translations, language } = useLanguage();
   const t = translations.salesOrders;
-  const c = translations.common;
   
+  // Data states
   const [sales, setSales] = useState<Sale[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   
+  // UI states
   const [isSaleDialogOpen, setIsSaleDialogOpen] = useState(false);
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<'sale' | 'order' | null>(null);
   
+  // Current item states
   const [currentSale, setCurrentSale] = useState<Sale>({
     id: "",
     locationId: "",
@@ -93,17 +61,6 @@ const SalesOrders = () => {
     items: [],
     status: "pending",
     notes: "",
-  });
-  
-  const [newSaleItem, setNewSaleItem] = useState<SaleItem>({
-    productId: "",
-    quantity: 1,
-    pricePerUnit: 0,
-  });
-  
-  const [newOrderItem, setNewOrderItem] = useState<OrderItem>({
-    productId: "",
-    quantity: 1,
   });
 
   useEffect(() => {
@@ -191,55 +148,15 @@ const SalesOrders = () => {
     setProducts(loadedProducts);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, type: 'sale' | 'order') => {
-    const { name, value } = e.target;
-    
-    if (type === 'sale') {
-      setCurrentSale((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    } else {
-      setCurrentOrder((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-  };
-
-  const handleSubmitSale = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!currentSale.locationId) {
-      toast.error(language === 'es' ? "La ubicación es obligatoria" : "Location is required");
-      return;
-    }
-    
-    if (currentSale.items.length === 0) {
-      toast.error(language === 'es' ? "Se requiere al menos un producto" : "At least one product is required");
-      return;
-    }
-    
-    saveSale(currentSale);
+  const handleSubmitSale = (sale: Sale) => {
+    saveSale(sale);
     loadSales();
     setIsSaleDialogOpen(false);
     navigate("/sales-orders");
   };
 
-  const handleSubmitOrder = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!currentOrder.locationId) {
-      toast.error(language === 'es' ? "La ubicación es obligatoria" : "Location is required");
-      return;
-    }
-    
-    if (currentOrder.items.length === 0) {
-      toast.error(language === 'es' ? "Se requiere al menos un producto" : "At least one product is required");
-      return;
-    }
-    
-    saveOrder(currentOrder);
+  const handleSubmitOrder = (order: Order) => {
+    saveOrder(order);
     loadOrders();
     setIsOrderDialogOpen(false);
     navigate("/sales-orders");
@@ -284,165 +201,20 @@ const SalesOrders = () => {
     navigate(`/sales-orders/orders/${order.id}`);
   };
 
+  const handleDeleteSaleFromList = (sale: Sale) => {
+    setCurrentSale(sale);
+    confirmDelete('sale');
+  };
+
+  const handleDeleteOrderFromList = (order: Order) => {
+    setCurrentOrder(order);
+    confirmDelete('order');
+  };
+
   const handleCloseDialog = () => {
     setIsSaleDialogOpen(false);
     setIsOrderDialogOpen(false);
     navigate("/sales-orders");
-  };
-
-  const handleAddSaleItem = () => {
-    if (!newSaleItem.productId || newSaleItem.quantity <= 0) {
-      toast.error("Select a product and specify quantity");
-      return;
-    }
-
-    // Check if item already exists
-    const existingItemIndex = currentSale.items.findIndex(
-      item => item.productId === newSaleItem.productId
-    );
-
-    if (existingItemIndex >= 0) {
-      // Update existing item
-      const updatedItems = [...currentSale.items];
-      updatedItems[existingItemIndex] = {
-        ...updatedItems[existingItemIndex],
-        quantity: updatedItems[existingItemIndex].quantity + newSaleItem.quantity,
-      };
-      
-      setCurrentSale(prev => ({
-        ...prev,
-        items: updatedItems,
-      }));
-    } else {
-      // Add new item
-      setCurrentSale(prev => ({
-        ...prev,
-        items: [...prev.items, { ...newSaleItem }],
-      }));
-    }
-
-    // Reset new item form
-    setNewSaleItem({
-      productId: "",
-      quantity: 1,
-      pricePerUnit: 0,
-    });
-  };
-
-  const handleAddOrderItem = () => {
-    if (!newOrderItem.productId || newOrderItem.quantity <= 0) {
-      toast.error("Select a product and specify quantity");
-      return;
-    }
-
-    // Check if item already exists
-    const existingItemIndex = currentOrder.items.findIndex(
-      item => item.productId === newOrderItem.productId
-    );
-
-    if (existingItemIndex >= 0) {
-      // Update existing item
-      const updatedItems = [...currentOrder.items];
-      updatedItems[existingItemIndex] = {
-        ...updatedItems[existingItemIndex],
-        quantity: updatedItems[existingItemIndex].quantity + newOrderItem.quantity,
-      };
-      
-      setCurrentOrder(prev => ({
-        ...prev,
-        items: updatedItems,
-      }));
-    } else {
-      // Add new item
-      setCurrentOrder(prev => ({
-        ...prev,
-        items: [...prev.items, { ...newOrderItem }],
-      }));
-    }
-
-    // Reset new item form
-    setNewOrderItem({
-      productId: "",
-      quantity: 1,
-    });
-  };
-
-  const handleRemoveSaleItem = (index: number) => {
-    setCurrentSale(prev => ({
-      ...prev,
-      items: prev.items.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleRemoveOrderItem = (index: number) => {
-    setCurrentOrder(prev => ({
-      ...prev,
-      items: prev.items.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleSaleProductChange = (productId: string) => {
-    const product = products.find(p => p.id === productId);
-    setNewSaleItem({
-      productId,
-      quantity: 1,
-      pricePerUnit: product ? product.suggestedRetailPrice : 0,
-    });
-  };
-
-  const handleOrderProductChange = (productId: string) => {
-    setNewOrderItem({
-      productId,
-      quantity: 1,
-    });
-  };
-
-  const handleOrderStatusChange = (status: 'pending' | 'delivered' | 'cancelled') => {
-    setCurrentOrder(prev => ({
-      ...prev,
-      status,
-    }));
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }).format(new Date(dateString));
-  };
-
-  const calculateSaleTotal = (items: SaleItem[]) => {
-    return items.reduce((sum, item) => sum + item.quantity * item.pricePerUnit, 0);
-  };
-
-  const getOrderStatusColor = (status: string) => {
-    switch (status) {
-      case "delivered":
-        return "text-green-600";
-      case "cancelled":
-        return "text-red-600";
-      default:
-        return "text-amber-600";
-    }
-  };
-
-  const getOrderStatusBg = (status: string) => {
-    switch (status) {
-      case "delivered":
-        return "bg-green-600";
-      case "cancelled":
-        return "bg-red-600";
-      default:
-        return "bg-amber-600";
-    }
   };
 
   return (
@@ -460,590 +232,54 @@ const SalesOrders = () => {
           </TabsList>
           
           <TabsContent value="sales" className="space-y-6">
-            <div className="flex justify-end">
-              <Button onClick={handleAddNewSale} className="bg-vendora-600 hover:bg-vendora-700">
-                <Plus className="mr-2 h-4 w-4" />
-                {t.recordSale}
-              </Button>
-            </div>
-            
-            {sales.length === 0 ? (
-              <div className="text-center py-12">
-                <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h2 className="mt-4 text-lg font-medium">{t.noSales}</h2>
-                <p className="mt-2 text-muted-foreground">
-                  {t.noSalesSubtext}
-                </p>
-                <Button onClick={handleAddNewSale} className="mt-4 bg-vendora-600 hover:bg-vendora-700">
-                  <Plus className="mr-2 h-4 w-4" />
-                  {t.recordSale}
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sales.map((sale) => (
-                  <Card key={sale.id} className="border-sage-200">
-                    <CardHeader className="pb-2 bg-sage-50">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <Store className="h-4 w-4 text-sage-600" />
-                          <CardTitle className="truncate text-base">{getLocationName(sale.locationId)}</CardTitle>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-8 w-8"
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                              <span className="sr-only">
-                                {language === 'es' ? 'Menú de acciones' : 'Actions menu'}
-                              </span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem onClick={() => handleEditSale(sale)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              {c.edit}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => {
-                                setCurrentSale(sale);
-                                confirmDelete('sale');
-                              }}
-                              className="text-destructive focus:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              {c.delete}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Calendar className="h-3 w-3" />
-                        <span>{formatDate(sale.date)}</span>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-4">
-                      <div className="space-y-1">
-                        {sale.items.map((item, idx) => (
-                          <div key={idx} className="flex justify-between text-sm">
-                            <div>{item.quantity}x {getProductName(item.productId)}</div>
-                            <div>{formatCurrency(item.pricePerUnit * item.quantity)}</div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-4 pt-2 border-t border-border flex justify-between font-medium">
-                        <div>{t.total}:</div>
-                        <div>{formatCurrency(calculateSaleTotal(sale.items))}</div>
-                      </div>
-                    </CardContent>
-                    {sale.notes && (
-                      <CardFooter className="pt-0">
-                        <div className="text-xs text-muted-foreground truncate w-full">
-                          {sale.notes}
-                        </div>
-                      </CardFooter>
-                    )}
-                  </Card>
-                ))}
-              </div>
-            )}
+            <SalesList 
+              sales={sales}
+              onAddNew={handleAddNewSale}
+              onEdit={handleEditSale}
+              onDelete={handleDeleteSaleFromList}
+            />
           </TabsContent>
           
           <TabsContent value="orders" className="space-y-6">
-            <div className="flex justify-end">
-              <Button onClick={handleAddNewOrder} className="bg-vendora-600 hover:bg-vendora-700">
-                <Plus className="mr-2 h-4 w-4" />
-                {t.newOrder}
-              </Button>
-            </div>
-            
-            {orders.length === 0 ? (
-              <div className="text-center py-12">
-                <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h2 className="mt-4 text-lg font-medium">{t.noOrders}</h2>
-                <p className="mt-2 text-muted-foreground">
-                  {t.noOrdersSubtext}
-                </p>
-                <Button onClick={handleAddNewOrder} className="mt-4 bg-vendora-600 hover:bg-vendora-700">
-                  <Plus className="mr-2 h-4 w-4" />
-                  {t.newOrder}
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {orders.map((order) => (
-                  <Card key={order.id} className={`border-${order.status === 'delivered' ? 'sage' : 'vendora'}-200`}>
-                    <CardHeader className={`pb-2 bg-${order.status === 'delivered' ? 'sage' : 'vendora'}-50`}>
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <Store className="h-4 w-4 text-vendora-600" />
-                          <CardTitle className="truncate text-base">{getLocationName(order.locationId)}</CardTitle>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-8 w-8"
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                              <span className="sr-only">
-                                {language === 'es' ? 'Menú de acciones' : 'Actions menu'}
-                              </span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem onClick={() => handleEditOrder(order)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              {c.edit}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => {
-                                setCurrentOrder(order);
-                                confirmDelete('order');
-                              }}
-                              className="text-destructive focus:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              {c.delete}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Calendar className="h-3 w-3" />
-                        <span>{formatDate(order.date)}</span>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-4">
-                      <div className="space-y-1">
-                        {order.items.map((item, idx) => (
-                          <div key={idx} className="flex justify-between text-sm">
-                            <div>{item.quantity}x {getProductName(item.productId)}</div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-4 pt-2 border-t border-border">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium">{t.status}:</span>
-                          <span className={`text-sm ${getOrderStatusColor(order.status)} font-medium flex items-center gap-1`}>
-                            <span className={`h-2 w-2 ${getOrderStatusBg(order.status)} rounded-full`}></span>
-                            {order.status === 'pending' ? t.pending : 
-                             order.status === 'delivered' ? t.delivered : 
-                             t.cancelled}
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                    {order.notes && (
-                      <CardFooter className="pt-0">
-                        <div className="text-xs text-muted-foreground truncate w-full">
-                          {order.notes}
-                        </div>
-                      </CardFooter>
-                    )}
-                  </Card>
-                ))}
-              </div>
-            )}
+            <OrdersList 
+              orders={orders}
+              onAddNew={handleAddNewOrder}
+              onEdit={handleEditOrder}
+              onDelete={handleDeleteOrderFromList}
+            />
           </TabsContent>
         </Tabs>
 
-        {/* Add/Edit Sale Dialog */}
-        <Dialog open={isSaleDialogOpen} onOpenChange={setIsSaleDialogOpen}>
-          <DialogContent className="sm:max-w-lg">
-            <form onSubmit={handleSubmitSale}>
-              <DialogHeader>
-                <DialogTitle>
-                  {params.id ? t.editSale : t.recordNewSale}
-                </DialogTitle>
-                <DialogDescription>
-                  {params.id
-                    ? t.updateSaleDetails
-                    : t.recordSaleDescription}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="locationId">{t.location}</Label>
-                    <Select
-                      value={currentSale.locationId}
-                      onValueChange={(value) =>
-                        setCurrentSale({ ...currentSale, locationId: value })
-                      }
-                    >
-                      <SelectTrigger id="locationId">
-                        <SelectValue placeholder={t.selectLocation} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {locations.map((location) => (
-                          <SelectItem key={location.id} value={location.id}>
-                            {location.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="saleDate">{t.date}</Label>
-                    <Input
-                      id="saleDate"
-                      name="date"
-                      type="date"
-                      value={currentSale.date}
-                      onChange={(e) => handleChange(e, 'sale')}
-                      required
-                    />
-                  </div>
-                </div>
+        {/* Sale Dialog */}
+        <SaleDialog
+          open={isSaleDialogOpen}
+          onOpenChange={setIsSaleDialogOpen}
+          sale={currentSale}
+          locations={locations}
+          products={products}
+          onSubmit={handleSubmitSale}
+          onDelete={() => confirmDelete('sale')}
+          isNew={!currentSale.id || params.action === "new-sale"}
+        />
 
-                <div className="space-y-2">
-                  <Label>{t.productsSold}</Label>
-                  <Card>
-                    <CardContent className="p-4">
-                      {/* Add new item form */}
-                      <div className="grid grid-cols-3 gap-2 mb-4">
-                        <Select
-                          value={newSaleItem.productId}
-                          onValueChange={handleSaleProductChange}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder={t.selectProduct} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {products.map((product) => (
-                              <SelectItem key={product.id} value={product.id}>
-                                {product.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <div className="flex gap-2 col-span-2">
-                          <Input
-                            type="number"
-                            min="1"
-                            value={newSaleItem.quantity}
-                            onChange={(e) =>
-                              setNewSaleItem({
-                                ...newSaleItem,
-                                quantity: parseInt(e.target.value) || 0,
-                              })
-                            }
-                            placeholder={t.quantity}
-                            className="w-20"
-                          />
-                          <Input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={newSaleItem.pricePerUnit}
-                            onChange={(e) =>
-                              setNewSaleItem({
-                                ...newSaleItem,
-                                pricePerUnit: parseFloat(e.target.value) || 0,
-                              })
-                            }
-                            placeholder={t.price}
-                            className="flex-1"
-                          />
-                          <Button
-                            type="button"
-                            onClick={handleAddSaleItem}
-                            className="bg-vendora-600 hover:bg-vendora-700"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Items list */}
-                      {currentSale.items.length === 0 ? (
-                        <div className="text-center py-4 text-muted-foreground">
-                          {t.noProductsAdded}
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          {currentSale.items.map((item, index) => (
-                            <div key={index} className="flex items-center justify-between border-b pb-2">
-                              <div className="flex-1">
-                                <div className="font-medium">{getProductName(item.productId)}</div>
-                                <div className="text-sm text-muted-foreground">
-                                  {item.quantity} × {formatCurrency(item.pricePerUnit)}
-                                </div>
-                              </div>
-                              <div className="text-right mr-2">
-                                {formatCurrency(item.quantity * item.pricePerUnit)}
-                              </div>
-                              <Button
-                                type="button"
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => handleRemoveSaleItem(index)}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
-                          <div className="flex justify-between font-medium pt-2">
-                            <div>{t.total}:</div>
-                            <div>{formatCurrency(calculateSaleTotal(currentSale.items))}</div>
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="saleNotes">{t.notes}</Label>
-                  <Textarea
-                    id="saleNotes"
-                    name="notes"
-                    value={currentSale.notes || ""}
-                    onChange={(e) => handleChange(e, 'sale')}
-                    placeholder={t.additionalInfo}
-                    rows={2}
-                  />
-                </div>
-              </div>
-              <DialogFooter className="flex items-center justify-between">
-                <div>
-                  {params.id && (
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      onClick={() => confirmDelete('sale')}
-                    >
-                      {c.delete}
-                    </Button>
-                  )}
-                </div>
-                <div className="flex space-x-2">
-                  <Button type="button" variant="outline" onClick={handleCloseDialog}>
-                    {c.cancel}
-                  </Button>
-                  <Button type="submit" className="bg-vendora-600 hover:bg-vendora-700">
-                    {params.id ? c.save : t.recordSale}
-                  </Button>
-                </div>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-
-        {/* Add/Edit Order Dialog */}
-        <Dialog open={isOrderDialogOpen} onOpenChange={setIsOrderDialogOpen}>
-          <DialogContent className="sm:max-w-lg">
-            <form onSubmit={handleSubmitOrder}>
-              <DialogHeader>
-                <DialogTitle>
-                  {params.id ? t.editOrder : t.createNewOrder}
-                </DialogTitle>
-                <DialogDescription>
-                  {params.id
-                    ? t.updateOrderDetails
-                    : t.createOrderDescription}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="orderLocationId">{t.location}</Label>
-                    <Select
-                      value={currentOrder.locationId}
-                      onValueChange={(value) =>
-                        setCurrentOrder({ ...currentOrder, locationId: value })
-                      }
-                    >
-                      <SelectTrigger id="orderLocationId">
-                        <SelectValue placeholder={t.selectLocation} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {locations.map((location) => (
-                          <SelectItem key={location.id} value={location.id}>
-                            {location.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="orderDate">{t.date}</Label>
-                    <Input
-                      id="orderDate"
-                      name="date"
-                      type="date"
-                      value={currentOrder.date}
-                      onChange={(e) => handleChange(e, 'order')}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>{t.productsOrdered}</Label>
-                  <Card>
-                    <CardContent className="p-4">
-                      {/* Add new item form */}
-                      <div className="grid grid-cols-3 gap-2 mb-4">
-                        <Select
-                          value={newOrderItem.productId}
-                          onValueChange={handleOrderProductChange}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder={t.selectProduct} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {products.map((product) => (
-                              <SelectItem key={product.id} value={product.id}>
-                                {product.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <div className="flex gap-2 col-span-2">
-                          <Input
-                            type="number"
-                            min="1"
-                            value={newOrderItem.quantity}
-                            onChange={(e) =>
-                              setNewOrderItem({
-                                ...newOrderItem,
-                                quantity: parseInt(e.target.value) || 0,
-                              })
-                            }
-                            placeholder={t.quantity}
-                            className="w-20"
-                          />
-                          <Button
-                            type="button"
-                            onClick={handleAddOrderItem}
-                            className="bg-vendora-600 hover:bg-vendora-700"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Items list */}
-                      {currentOrder.items.length === 0 ? (
-                        <div className="text-center py-4 text-muted-foreground">
-                          {t.noProductsAdded}
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          {currentOrder.items.map((item, index) => (
-                            <div key={index} className="flex items-center justify-between border-b pb-2">
-                              <div className="flex-1">
-                                <div className="font-medium">{getProductName(item.productId)}</div>
-                                <div className="text-sm text-muted-foreground">
-                                  {t.quantity}: {item.quantity}
-                                </div>
-                              </div>
-                              <Button
-                                type="button"
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => handleRemoveOrderItem(index)}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="status">{t.status}</Label>
-                  <Select
-                    value={currentOrder.status}
-                    onValueChange={(value) =>
-                      handleOrderStatusChange(value as 'pending' | 'delivered' | 'cancelled')
-                    }
-                  >
-                    <SelectTrigger id="status">
-                      <SelectValue placeholder={t.selectStatus} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">{t.pending}</SelectItem>
-                      <SelectItem value="delivered">{t.delivered}</SelectItem>
-                      <SelectItem value="cancelled">{t.cancelled}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="orderNotes">{t.notes}</Label>
-                  <Textarea
-                    id="orderNotes"
-                    name="notes"
-                    value={currentOrder.notes || ""}
-                    onChange={(e) => handleChange(e, 'order')}
-                    placeholder={t.specialInstructions}
-                    rows={2}
-                  />
-                </div>
-              </div>
-              <DialogFooter className="flex items-center justify-between">
-                <div>
-                  {params.id && (
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      onClick={() => confirmDelete('order')}
-                    >
-                      {c.delete}
-                    </Button>
-                  )}
-                </div>
-                <div className="flex space-x-2">
-                  <Button type="button" variant="outline" onClick={handleCloseDialog}>
-                    {c.cancel}
-                  </Button>
-                  <Button type="submit" className="bg-vendora-600 hover:bg-vendora-700">
-                    {params.id ? c.save : t.newOrder}
-                  </Button>
-                </div>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+        {/* Order Dialog */}
+        <OrderDialog
+          open={isOrderDialogOpen}
+          onOpenChange={setIsOrderDialogOpen}
+          order={currentOrder}
+          locations={locations}
+          products={products}
+          onSubmit={handleSubmitOrder}
+          onDelete={() => confirmDelete('order')}
+          isNew={!currentOrder.id || params.action === "new-order"}
+        />
 
         {/* Delete Confirmation Dialog */}
-        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>{t.confirmDelete}</DialogTitle>
-              <DialogDescription>
-                {t.confirmDeleteDescription}
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsDeleteDialogOpen(false);
-                  setItemToDelete(null);
-                }}
-              >
-                {c.cancel}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={itemToDelete === 'sale' ? handleDeleteSale : handleDeleteOrder}
-              >
-                {c.delete}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <DeleteConfirmationDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          onConfirm={itemToDelete === 'sale' ? handleDeleteSale : handleDeleteOrder}
+        />
       </main>
     </div>
   );
