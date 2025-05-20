@@ -20,11 +20,12 @@ export const saveSale = (sale: Sale): void => {
   
   saveData(data);
   
+  const language = localStorage.getItem('language') || 'en';
   const message = index >= 0 ? 
     { en: "Sale updated", es: "Venta actualizada" } : 
     { en: "Sale added", es: "Venta añadida" };
   
-  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
+  toast.success(language === 'es' ? message.es : message.en);
 };
 
 export const deleteSale = (id: string): void => {
@@ -32,6 +33,7 @@ export const deleteSale = (id: string): void => {
   data.sales = data.sales.filter(s => s.id !== id);
   saveData(data);
   
+  const language = localStorage.getItem('language') || 'en';
   const message = { en: "Sale deleted", es: "Venta eliminada" };
-  toast.success(document.documentElement.lang === 'es' ? message.es : message.en);
+  toast.success(language === 'es' ? message.es : message.en);
 };

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -33,6 +32,8 @@ import {
   Calendar,
   ArrowRight,
   Check,
+  MoreVertical,
+  Trash2,
 } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { Sale, SaleItem, Order, OrderItem, Location, Product } from "@/types";
@@ -51,13 +52,19 @@ import {
   getProductById,
 } from "@/utils/dataStorage";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const SalesOrders = () => {
   const params = useParams();
   const routeLocation = useLocation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sales");
-  const { translations } = useLanguage();
+  const { translations, language } = useLanguage();
   const t = translations.salesOrders;
   const c = translations.common;
   
@@ -69,6 +76,7 @@ const SalesOrders = () => {
   const [isSaleDialogOpen, setIsSaleDialogOpen] = useState(false);
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<'sale' | 'order' | null>(null);
   
   const [currentSale, setCurrentSale] = useState<Sale>({
     id: "",
@@ -111,6 +119,10 @@ const SalesOrders = () => {
       setActiveTab("sales");
     } else if (routeLocation.pathname.includes("new-order")) {
       setActiveTab("orders");
+    } else if (routeLocation.pathname.includes("sales/")) {
+      setActiveTab("sales");
+    } else if (routeLocation.pathname.includes("orders/")) {
+      setActiveTab("orders");
     }
     
     const id = params.id;
@@ -136,24 +148,24 @@ const SalesOrders = () => {
       });
       setIsOrderDialogOpen(true);
     } else if (id) {
-      // Determine if it's a sale or order
-      if (routeLocation.pathname.includes("sales")) {
+      // Determine if it's a sale or order based on the URL path
+      if (routeLocation.pathname.includes("/sales-orders/sales/")) {
         const sale = sales.find((s) => s.id === id);
         if (sale) {
           setCurrentSale(sale);
           setIsSaleDialogOpen(true);
         } else {
           navigate("/sales-orders");
-          toast.error("Sale not found");
+          toast.error(language === 'es' ? "Venta no encontrada" : "Sale not found");
         }
-      } else if (routeLocation.pathname.includes("orders")) {
+      } else if (routeLocation.pathname.includes("/sales-orders/orders/")) {
         const order = orders.find((o) => o.id === id);
         if (order) {
           setCurrentOrder(order);
           setIsOrderDialogOpen(true);
         } else {
           navigate("/sales-orders");
-          toast.error("Order not found");
+          toast.error(language === 'es' ? "Orden no encontrada" : "Order not found");
         }
       }
     }
@@ -199,12 +211,12 @@ const SalesOrders = () => {
     e.preventDefault();
     
     if (!currentSale.locationId) {
-      toast.error("Location is required");
+      toast.error(language === 'es' ? "La ubicación es obligatoria" : "Location is required");
       return;
     }
     
     if (currentSale.items.length === 0) {
-      toast.error("At least one product is required");
+      toast.error(language === 'es' ? "Se requiere al menos un producto" : "At least one product is required");
       return;
     }
     
@@ -218,12 +230,12 @@ const SalesOrders = () => {
     e.preventDefault();
     
     if (!currentOrder.locationId) {
-      toast.error("Location is required");
+      toast.error(language === 'es' ? "La ubicación es obligatoria" : "Location is required");
       return;
     }
     
     if (currentOrder.items.length === 0) {
-      toast.error("At least one product is required");
+      toast.error(language === 'es' ? "Se requiere al menos un producto" : "At least one product is required");
       return;
     }
     
@@ -237,6 +249,7 @@ const SalesOrders = () => {
     deleteSale(currentSale.id);
     loadSales();
     setIsDeleteDialogOpen(false);
+    setItemToDelete(null);
     setIsSaleDialogOpen(false);
     navigate("/sales-orders");
   };
@@ -245,8 +258,14 @@ const SalesOrders = () => {
     deleteOrder(currentOrder.id);
     loadOrders();
     setIsDeleteDialogOpen(false);
+    setItemToDelete(null);
     setIsOrderDialogOpen(false);
     navigate("/sales-orders");
+  };
+
+  const confirmDelete = (type: 'sale' | 'order') => {
+    setItemToDelete(type);
+    setIsDeleteDialogOpen(true);
   };
 
   const handleAddNewSale = () => {
@@ -470,13 +489,36 @@ const SalesOrders = () => {
                           <Store className="h-4 w-4 text-sage-600" />
                           <CardTitle className="truncate text-base">{getLocationName(sale.locationId)}</CardTitle>
                         </div>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => handleEditSale(sale)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8"
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                              <span className="sr-only">
+                                {language === 'es' ? 'Menú de acciones' : 'Actions menu'}
+                              </span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuItem onClick={() => handleEditSale(sale)}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              {c.edit}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => {
+                                setCurrentSale(sale);
+                                confirmDelete('sale');
+                              }}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              {c.delete}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Calendar className="h-3 w-3" />
@@ -540,13 +582,36 @@ const SalesOrders = () => {
                           <Store className="h-4 w-4 text-vendora-600" />
                           <CardTitle className="truncate text-base">{getLocationName(order.locationId)}</CardTitle>
                         </div>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => handleEditOrder(order)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8"
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                              <span className="sr-only">
+                                {language === 'es' ? 'Menú de acciones' : 'Actions menu'}
+                              </span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuItem onClick={() => handleEditOrder(order)}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              {c.edit}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => {
+                                setCurrentOrder(order);
+                                confirmDelete('order');
+                              }}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              {c.delete}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Calendar className="h-3 w-3" />
@@ -751,7 +816,7 @@ const SalesOrders = () => {
                     <Button
                       type="button"
                       variant="destructive"
-                      onClick={() => setIsDeleteDialogOpen(true)}
+                      onClick={() => confirmDelete('sale')}
                     >
                       {c.delete}
                     </Button>
@@ -932,7 +997,7 @@ const SalesOrders = () => {
                     <Button
                       type="button"
                       variant="destructive"
-                      onClick={() => setIsDeleteDialogOpen(true)}
+                      onClick={() => confirmDelete('order')}
                     >
                       {c.delete}
                     </Button>
@@ -963,13 +1028,16 @@ const SalesOrders = () => {
             <DialogFooter>
               <Button
                 variant="outline"
-                onClick={() => setIsDeleteDialogOpen(false)}
+                onClick={() => {
+                  setIsDeleteDialogOpen(false);
+                  setItemToDelete(null);
+                }}
               >
                 {c.cancel}
               </Button>
               <Button
                 variant="destructive"
-                onClick={activeTab === "sales" ? handleDeleteSale : handleDeleteOrder}
+                onClick={itemToDelete === 'sale' ? handleDeleteSale : handleDeleteOrder}
               >
                 {c.delete}
               </Button>
