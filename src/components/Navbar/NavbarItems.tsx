@@ -13,7 +13,8 @@ export const NavbarItems = ({ onMobileItemClick }: { onMobileItemClick?: () => v
     { path: "/locations", label: translations.navbar.locations, icon: <Store className="h-5 w-5" /> },
     { path: "/products", label: translations.navbar.products, icon: <Package className="h-5 w-5" /> },
     { path: "/deliveries", label: translations.navbar.deliveries, icon: <Truck className="h-5 w-5" /> },
-    { path: "/sales-orders", label: translations.navbar.salesOrders, icon: <ShoppingCart className="h-5 w-5" /> },
+    { path: "/sales", label: translations.navbar.sales, icon: <ShoppingCart className="h-5 w-5" /> },
+    { path: "/orders", label: translations.navbar.orders, icon: <ShoppingCart className="h-5 w-5" /> },
     { path: "/reports", label: translations.navbar.reports, icon: <FileText className="h-5 w-5" /> },
   ];
 

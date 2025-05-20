@@ -1,3 +1,4 @@
+
 export const english = {
   app: {
     title: "Vendora",
@@ -35,6 +36,8 @@ export const english = {
     products: "Products",
     deliveries: "Deliveries",
     salesOrders: "Sales & Orders",
+    sales: "Sales",
+    orders: "Orders",
     reports: "Reports",
   },
   locations: {
