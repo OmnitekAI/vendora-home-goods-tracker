@@ -50,8 +50,8 @@ const SaleItemForm = ({ products, onAdd }: SaleItemFormProps) => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-2 mb-4">
-      <div className="flex-grow">
+    <div className="grid grid-cols-1 gap-2 mb-4">
+      <div className="w-full">
         <Select
           value={newItem.productId}
           onValueChange={handleProductChange}
@@ -68,7 +68,7 @@ const SaleItemForm = ({ products, onAdd }: SaleItemFormProps) => {
           </SelectContent>
         </Select>
       </div>
-      <div className="flex gap-2 min-w-[120px]">
+      <div className="flex gap-2 w-full">
         <Input
           type="number"
           min="1"
@@ -80,7 +80,7 @@ const SaleItemForm = ({ products, onAdd }: SaleItemFormProps) => {
             })
           }
           placeholder={t.quantity}
-          className="flex-grow"
+          className="flex-grow min-w-[80px]"
         />
         <Button
           type="button"
