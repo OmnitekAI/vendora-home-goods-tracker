@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Delivery, DeliveryItem, Location, Product } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -43,7 +44,7 @@ export const DeliveryDialog = ({
   onDelete,
   formatCurrency,
 }: DeliveryDialogProps) => {
-  const { translations } = useLanguage();
+  const { translations, language } = useLanguage();
   const [delivery, setDelivery] = useState<Delivery>(currentDelivery);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [newItem, setNewItem] = useState<DeliveryItem>({
@@ -69,12 +70,12 @@ export const DeliveryDialog = ({
     e.preventDefault();
     
     if (!delivery.locationId) {
-      toast.error(translations.common.required);
+      toast.error(language === 'es' ? "La ubicación es obligatoria" : "Location is required");
       return;
     }
     
     if (delivery.items.length === 0) {
-      toast.error(translations.common.required);
+      toast.error(language === 'es' ? "Se requiere al menos un producto" : "At least one product is required");
       return;
     }
     
@@ -83,9 +84,13 @@ export const DeliveryDialog = ({
 
   const handleAddItem = () => {
     if (!newItem.productId || newItem.quantity <= 0) {
-      toast.error(translations.common.required);
+      toast.error(language === 'es' ? "Seleccione un producto y especifique la cantidad" : "Select a product and specify quantity");
       return;
     }
+
+    // Set the price automatically from the selected product
+    const selectedProduct = products.find(p => p.id === newItem.productId);
+    const pricePerUnit = selectedProduct ? selectedProduct.wholesalePrice : 0;
 
     // Check if item already exists
     const existingItemIndex = delivery.items.findIndex(
@@ -105,10 +110,13 @@ export const DeliveryDialog = ({
         items: updatedItems,
       }));
     } else {
-      // Add new item
+      // Add new item with automatically set price
       setDelivery(prev => ({
         ...prev,
-        items: [...prev.items, { ...newItem }],
+        items: [...prev.items, { 
+          ...newItem,
+          pricePerUnit
+        }],
       }));
     }
 
@@ -202,11 +210,12 @@ export const DeliveryDialog = ({
                 <Label>{translations.products.title}</Label>
                 <Card>
                   <CardContent className="p-4">
-                    {/* Add new item form */}
-                    <div className="grid grid-cols-3 gap-2 mb-4">
+                    {/* Add new item form - Simplified for mobile */}
+                    <div className="grid grid-cols-4 gap-2 mb-4">
                       <Select
                         value={newItem.productId || undefined}
                         onValueChange={handleProductChange}
+                        className="col-span-3"
                       >
                         <SelectTrigger>
                           <SelectValue placeholder={translations.deliveries.product} />
@@ -223,7 +232,7 @@ export const DeliveryDialog = ({
                           )}
                         </SelectContent>
                       </Select>
-                      <div className="flex gap-2 col-span-2">
+                      <div className="flex gap-2">
                         <Input
                           type="number"
                           min="1"
@@ -235,21 +244,7 @@ export const DeliveryDialog = ({
                             })
                           }
                           placeholder={translations.deliveries.quantity}
-                          className="w-20"
-                        />
-                        <Input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={newItem.pricePerUnit}
-                          onChange={(e) =>
-                            setNewItem({
-                              ...newItem,
-                              pricePerUnit: parseFloat(e.target.value) || 0,
-                            })
-                          }
-                          placeholder={translations.deliveries.price}
-                          className="flex-1"
+                          className="w-16"
                         />
                         <Button
                           type="button"

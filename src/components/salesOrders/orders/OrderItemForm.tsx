@@ -41,10 +41,11 @@ const OrderItemForm = ({ item, products, onItemChange, onAddItem }: OrderItemFor
   };
 
   return (
-    <div className="grid grid-cols-3 gap-2 mb-4">
+    <div className="grid grid-cols-4 gap-2 mb-4">
       <Select
         value={item.productId}
         onValueChange={handleOrderProductChange}
+        className="col-span-3"
       >
         <SelectTrigger>
           <SelectValue placeholder={t.selectProduct} />
@@ -57,14 +58,14 @@ const OrderItemForm = ({ item, products, onItemChange, onAddItem }: OrderItemFor
           ))}
         </SelectContent>
       </Select>
-      <div className="flex gap-2 col-span-2">
+      <div className="flex gap-2">
         <Input
           type="number"
           min="1"
           value={item.quantity}
           onChange={handleQuantityChange}
           placeholder={t.quantity}
-          className="w-20"
+          className="w-16"
         />
         <Button
           type="button"
