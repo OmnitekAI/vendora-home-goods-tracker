@@ -50,23 +50,25 @@ const SaleItemForm = ({ products, onAdd }: SaleItemFormProps) => {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-2 mb-4">
-      <Select
-        value={newItem.productId}
-        onValueChange={handleProductChange}
-      >
-        <SelectTrigger className="col-span-9">
-          <SelectValue placeholder={t.selectProduct} />
-        </SelectTrigger>
-        <SelectContent>
-          {products.map((product) => (
-            <SelectItem key={product.id} value={product.id}>
-              {product.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <div className="col-span-3 flex gap-2">
+    <div className="flex flex-col sm:flex-row gap-2 mb-4">
+      <div className="flex-grow">
+        <Select
+          value={newItem.productId}
+          onValueChange={handleProductChange}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder={t.selectProduct} />
+          </SelectTrigger>
+          <SelectContent>
+            {products.map((product) => (
+              <SelectItem key={product.id} value={product.id}>
+                {product.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex gap-2 min-w-[120px]">
         <Input
           type="number"
           min="1"

@@ -210,28 +210,30 @@ export const DeliveryDialog = ({
                 <Label>{translations.products.title}</Label>
                 <Card>
                   <CardContent className="p-4">
-                    {/* Add new item form - Modified to use full width */}
-                    <div className="grid grid-cols-12 gap-2 mb-4">
-                      <Select
-                        value={newItem.productId || undefined}
-                        onValueChange={handleProductChange}
-                      >
-                        <SelectTrigger className="col-span-9">
-                          <SelectValue placeholder={translations.deliveries.product} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {hasValidProducts ? (
-                            products.map((product) => (
-                              <SelectItem key={product.id} value={product.id}>
-                                {product.name}
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <SelectItem value="no_products_available">{translations.common.noData}</SelectItem>
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <div className="col-span-3 flex gap-2">
+                    {/* Add new item form - Modified for better mobile experience */}
+                    <div className="flex flex-col sm:flex-row gap-2 mb-4">
+                      <div className="flex-grow">
+                        <Select
+                          value={newItem.productId || undefined}
+                          onValueChange={handleProductChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={translations.deliveries.product} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {hasValidProducts ? (
+                              products.map((product) => (
+                                <SelectItem key={product.id} value={product.id}>
+                                  {product.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="no_products_available">{translations.common.noData}</SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex gap-2 min-w-[120px]">
                         <Input
                           type="number"
                           min="1"
