@@ -50,13 +50,12 @@ const SaleItemForm = ({ products, onAdd }: SaleItemFormProps) => {
   };
 
   return (
-    <div className="grid grid-cols-4 gap-2 mb-4">
+    <div className="grid grid-cols-12 gap-2 mb-4">
       <Select
         value={newItem.productId}
         onValueChange={handleProductChange}
-        className="col-span-3"
       >
-        <SelectTrigger>
+        <SelectTrigger className="col-span-9">
           <SelectValue placeholder={t.selectProduct} />
         </SelectTrigger>
         <SelectContent>
@@ -67,7 +66,7 @@ const SaleItemForm = ({ products, onAdd }: SaleItemFormProps) => {
           ))}
         </SelectContent>
       </Select>
-      <div className="flex gap-2">
+      <div className="col-span-3 flex gap-2">
         <Input
           type="number"
           min="1"
@@ -79,7 +78,7 @@ const SaleItemForm = ({ products, onAdd }: SaleItemFormProps) => {
             })
           }
           placeholder={t.quantity}
-          className="w-16"
+          className="flex-grow"
         />
         <Button
           type="button"

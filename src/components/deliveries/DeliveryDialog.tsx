@@ -210,14 +210,13 @@ export const DeliveryDialog = ({
                 <Label>{translations.products.title}</Label>
                 <Card>
                   <CardContent className="p-4">
-                    {/* Add new item form - Simplified for mobile */}
-                    <div className="grid grid-cols-4 gap-2 mb-4">
+                    {/* Add new item form - Modified to use full width */}
+                    <div className="grid grid-cols-12 gap-2 mb-4">
                       <Select
                         value={newItem.productId || undefined}
                         onValueChange={handleProductChange}
-                        className="col-span-3"
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="col-span-9">
                           <SelectValue placeholder={translations.deliveries.product} />
                         </SelectTrigger>
                         <SelectContent>
@@ -232,7 +231,7 @@ export const DeliveryDialog = ({
                           )}
                         </SelectContent>
                       </Select>
-                      <div className="flex gap-2">
+                      <div className="col-span-3 flex gap-2">
                         <Input
                           type="number"
                           min="1"
@@ -244,7 +243,7 @@ export const DeliveryDialog = ({
                             })
                           }
                           placeholder={translations.deliveries.quantity}
-                          className="w-16"
+                          className="flex-grow"
                         />
                         <Button
                           type="button"
